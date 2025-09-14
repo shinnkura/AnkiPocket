@@ -364,7 +364,7 @@ export default function AnkiVocabularyApp() {
             <div className="flex-1" />
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-foreground">
-                Anki単語登録アプリ
+                AnkiPocket
               </h1>
               <p className="text-muted-foreground">
                 英単語を入力して、意味と画像を自動生成してAnkiに送信

@@ -23,6 +23,9 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // ページタイトルを設定
+    document.title = "AnkiPocket - 設定";
+
     // localStorageから設定を読み込み
     if (typeof window !== "undefined") {
       const savedSettings = localStorage.getItem("ankiPocketSettings");
@@ -76,7 +79,7 @@ export default function SettingsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">設定</h1>
             <p className="text-muted-foreground">
-              Anki単語登録アプリの設定を変更
+              AnkiPocketの設定を変更
             </p>
           </div>
         </div>

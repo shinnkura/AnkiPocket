@@ -8,7 +8,7 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Anki単語登録アプリ",
+  title: "AnkiPocket",
   description: "英単語を簡単にAnkiに登録できるアプリ",
   generator: "v0.app",
 }
