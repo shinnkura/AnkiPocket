@@ -158,13 +158,13 @@ export default function AnkiVocabularyApp() {
 
           const storeMediaResult = await storeMediaResponse.json();
           if (storeMediaResult.error) {
-            console.log(`[v0] 画像保存エラー: ${storeMediaResult.error}`);
+            console.log(`画像保存エラー: ${storeMediaResult.error}`);
             imageFileName = ""; // エラーの場合は画像なしで続行
           } else {
-            console.log(`[v0] 画像保存成功: ${imageFileName}`);
+            console.log(`画像保存成功: ${imageFileName}`);
           }
         } catch (imageError) {
-          console.log(`[v0] 画像処理エラー: ${imageError}`);
+          console.log(`画像処理エラー: ${imageError}`);
           imageFileName = ""; // エラーの場合は画像なしで続行
         }
       }
@@ -191,14 +191,14 @@ export default function AnkiVocabularyApp() {
       }
 
       const availableModels = modelNamesResult.result;
-      console.log(`[v0] 利用可能なノートタイプ:`, availableModels);
+      console.log(`利用可能なノートタイプ:`, availableModels);
 
       if (!availableModels || availableModels.length === 0) {
         throw new Error("利用可能なノートタイプが見つかりません");
       }
 
       const modelName = availableModels[0];
-      console.log(`[v0] 使用するノートタイプ: ${modelName}`);
+      console.log(`使用するノートタイプ: ${modelName}`);
 
       const modelFieldsResponse = await fetch("http://127.0.0.1:8765", {
         method: "POST",
@@ -216,7 +216,7 @@ export default function AnkiVocabularyApp() {
 
       const modelFieldsResult = await modelFieldsResponse.json();
       const fieldNames = modelFieldsResult.result || ["Front", "Back"];
-      console.log(`[v0] 利用可能なフィールド:`, fieldNames);
+      console.log(`利用可能なフィールド:`, fieldNames);
 
       const fields: Record<string, string> = {};
 
