@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Volume2, ImageIcon, Send, Settings } from "lucide-react";
+import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 
@@ -43,6 +43,8 @@ export default function AnkiVocabularyApp() {
   const [imageLoading, setImageLoading] = useState(false);
   const [currentDomain, setCurrentDomain] = useState("");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [imageQuery, setImageQuery] = useState("");
+  const [showImageQueryInput, setShowImageQueryInput] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -85,24 +87,60 @@ export default function AnkiVocabularyApp() {
     }
   };
 
-  const generateImage = async () => {
-    if (!word.trim()) return;
+  const generateImage = async (customQuery?: string) => {
+    // デバッグ用ログ - 個別の値をチェック
+    console.log('generateImage called - individual values:', {
+      customQuery: { value: customQuery, type: typeof customQuery },
+      imageQuery: { value: imageQuery, type: typeof imageQuery },
+      word: { value: word, type: typeof word }
+    });
+
+    const queryToUse = customQuery || imageQuery || word;
+
+    console.log('generateImage - queryToUse details:', {
+      queryToUse,
+      queryToUseType: typeof queryToUse,
+      isString: typeof queryToUse === 'string',
+      hasValue: !!queryToUse,
+      canTrim: queryToUse && typeof queryToUse === 'string',
+      trimmedValue: (queryToUse && typeof queryToUse === 'string') ? queryToUse.trim() : 'CANNOT_TRIM'
+    });
+
+    if (!queryToUse || typeof queryToUse !== 'string' || !queryToUse.trim()) {
+      console.error('Invalid queryToUse detected:', {
+        queryToUse,
+        typeCheck: typeof queryToUse,
+        truthyCheck: !!queryToUse
+      });
+
+      toast({
+        title: "画像生成エラー",
+        description: "検索キーワードが無効です。単語を入力してから画像生成を試してください。",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setImageLoading(true);
     try {
       // API Routeを使用してUnsplash画像を取得
       const response = await fetch(
-        `/api/unsplash?query=${encodeURIComponent(word)}`
+        `/api/unsplash?query=${encodeURIComponent(queryToUse)}`
       );
 
       if (response.ok) {
         const data = await response.json();
         setImageUrl(data.imageUrl);
 
+        // 最初の生成時にimageQueryを初期化
+        if (!imageQuery) {
+          setImageQuery(queryToUse);
+        }
+
         if (data.source === "unsplash") {
           toast({
             title: "画像取得成功",
-            description: "Unsplashから関連画像を取得しました！",
+            description: `「${queryToUse}」の画像を取得しました！`,
           });
         } else {
           toast({
@@ -129,6 +167,30 @@ export default function AnkiVocabularyApp() {
     } finally {
       setImageLoading(false);
     }
+  };
+
+  const handleImageRegenerate = () => {
+    setShowImageQueryInput(true);
+  };
+
+  const handleImageRegenerateSubmit = async () => {
+    if (!imageQuery.trim()) {
+      toast({
+        title: "入力エラー",
+        description: "検索キーワードを入力してください。",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await generateImage(imageQuery);
+    setShowImageQueryInput(false);
+  };
+
+  const handleImageRegenerateCancel = () => {
+    setShowImageQueryInput(false);
+    // 元の検索クエリに戻す
+    setImageQuery(word);
   };
 
   const sendToAnki = async () => {
@@ -586,7 +648,7 @@ export default function AnkiVocabularyApp() {
               <div className="flex gap-3 pt-4">
                 <Button
                   variant="outline"
-                  onClick={generateImage}
+                  onClick={() => generateImage(word)}
                   disabled={imageLoading}
                   className="flex-1 h-11 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
                 >
@@ -618,17 +680,84 @@ export default function AnkiVocabularyApp() {
         {imageUrl && (
           <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
             <CardHeader className="text-center">
-              <CardTitle className="text-lg text-blue-600 dark:text-blue-400">
+              <CardTitle className="text-lg text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
                 生成された画像
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleImageRegenerate}
+                  disabled={imageLoading}
+                  className="h-8 px-3 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span className="ml-1 text-xs">再生成</span>
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <img
-                src={imageUrl || "/placeholder.svg"}
-                alt={word}
-                className="w-full max-w-md mx-auto rounded border border-blue-200 dark:border-gray-600"
-                crossOrigin="anonymous"
-              />
+              <div className="space-y-4">
+                {showImageQueryInput && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        画像検索キーワード
+                      </label>
+                      <Input
+                        placeholder="例: red apple, sunset landscape..."
+                        value={imageQuery}
+                        onChange={(e) => setImageQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && handleImageRegenerateSubmit()}
+                        className="mt-1 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        現在: 「{imageQuery || word}」で検索
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleImageRegenerateSubmit}
+                        disabled={imageLoading || !imageQuery.trim()}
+                        className="flex-1 h-9 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                      >
+                        {imageLoading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            生成中...
+                          </>
+                        ) : (
+                          <>
+                            <ImageIcon className="h-4 w-4 mr-2" />
+                            画像を生成
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleImageRegenerateCancel}
+                        disabled={imageLoading}
+                        className="h-9 px-4 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
+                      >
+                        キャンセル
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <img
+                  src={imageUrl || "/placeholder.svg"}
+                  alt={imageQuery || word}
+                  className="w-full max-w-md mx-auto rounded border border-blue-200 dark:border-gray-600"
+                  crossOrigin="anonymous"
+                />
+
+                {imageLoading && (
+                  <div className="text-center">
+                    <p className="text-sm text-blue-600 dark:text-blue-400">
+                      「{imageQuery || word}」の画像を生成しています...
+                    </p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         )}

@@ -122,7 +122,7 @@ export default function SettingsPage() {
               <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
                   <strong>ヒント:</strong> 単語カードを追加するAnkiデッキの名前を設定してください。
-                  デッキが存在しない場合は自動的に作成されます。
+                  デッキが存在しない場合は保存されません。
                 </p>
               </div>
             </div>
