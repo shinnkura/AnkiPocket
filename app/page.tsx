@@ -341,16 +341,128 @@ export default function AnkiVocabularyApp() {
       setDefinition(null);
       setImageUrl("");
     } catch (error) {
-      toast({
-        title: "Anki送信エラー",
-        description: `エラー: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }
+      console.error("Anki送信エラーの詳細:", error);
+
+      let errorTitle = "Anki送信エラー";
+      let errorDescription = "";
+
+      if (error instanceof Error) {
+        const errorMessage = error.message.toLowerCase();
+
+        // HTTPエラーの場合
+        if (errorMessage.includes("http")) {
+          const statusMatch = error.message.match(/HTTP (\d+):/);
+          const status = statusMatch ? parseInt(statusMatch[1]) : null;
+
+          switch (status) {
+            case 0:
+            case null:
+              errorTitle = "接続エラー";
+              errorDescription = `AnkiConnectに接続できません。
 
 【確認事項】
+• Ankiアプリが起動していることを確認してください
+• AnkiConnectアドオン (2055492159) がインストールされていることを確認してください
+• Ankiの「ツール」→「アドオン」でAnkiConnectが有効になっていることを確認してください
+
+【エラー詳細】${error.message}`;
+              break;
+            case 404:
+              errorTitle = "AnkiConnect未検出";
+              errorDescription = `AnkiConnectが見つかりません。
+
+【確認事項】
+• AnkiConnectアドオン (2055492159) をインストールしてください
+• Ankiを再起動してください
+
+【エラー詳細】${error.message}`;
+              break;
+            case 403:
+              errorTitle = "CORS設定エラー";
+              errorDescription = `CORS設定が正しくありません。
+
+【設定手順】
+1. Ankiの「ツール」→「アドオン」を開く
+2. AnkiConnectを選択し「設定」をクリック
+3. "webCorsOriginList" に "${currentDomain}" を追加
+4. Ankiを再起動
+
+【エラー詳細】${error.message}`;
+              break;
+            case 500:
+              errorTitle = "Anki内部エラー";
+              errorDescription = `Anki側でエラーが発生しました。
+
+【確認事項】
+• 指定されたデッキ名「${settings.deckName}」が有効か確認してください
+• Ankiのノートタイプが正しく設定されているか確認してください
+
+【エラー詳細】${error.message}`;
+              break;
+            default:
+              errorDescription = `HTTP ${status} エラーが発生しました。
+
+【エラー詳細】${error.message}
+
+【確認事項】
+• Ankiアプリが起動していることを確認してください
+• AnkiConnectアドオンが正しく動作しているか確認してください`;
+          }
+        }
+        // AnkiConnect API固有のエラー
+        else if (errorMessage.includes("cannot create note because it is a duplicate")) {
+          errorTitle = "重複エラー";
+          errorDescription = `「${word}」は既にAnkiに存在します。
+
+【対処法】
+• 既存のカードを確認してください
+• 異なる単語を入力してください
+• Ankiで重複カードを削除してから再度お試しください`;
+        }
+        else if (errorMessage.includes("deck was not found")) {
+          errorTitle = "デッキエラー";
+          errorDescription = `デッキ「${settings.deckName}」が見つかりません。
+
+【対処法】
+• Ankiでデッキを作成してください
+• 設定ページで正しいデッキ名を入力してください
+• デッキ名の大文字小文字が正確か確認してください
+
+【エラー詳細】${error.message}`;
+        }
+        else if (errorMessage.includes("model was not found")) {
+          errorTitle = "ノートタイプエラー";
+          errorDescription = `ノートタイプが見つかりません。
+
+【対処法】
+• Ankiに適切なノートタイプが存在することを確認してください
+• 「Basic」や「Basic (and reversed card)」ノートタイプを使用してみてください
+
+【エラー詳細】${error.message}`;
+        }
+        else {
+          errorDescription = `予期しないエラーが発生しました。
+
+【エラー詳細】${error.message}
+
+【基本的な確認事項】
 • Ankiアプリが起動していますか？
 • AnkiConnectアドオンがインストールされていますか？
-• CORS設定: webCorsOriginList に ["https://*/*"] を追加してください`,
+• CORS設定は正しく行われていますか？`;
+        }
+      } else {
+        errorDescription = `不明なエラーが発生しました。
+
+【エラー詳細】${String(error)}
+
+【確認事項】
+• Ankiアプリが起動していることを確認してください
+• AnkiConnectアドオンが正しくインストールされているか確認してください`;
+      }
+
+      toast({
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive",
       });
     }
