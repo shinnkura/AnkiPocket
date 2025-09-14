@@ -357,59 +357,78 @@ export default function AnkiVocabularyApp() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
+    <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
+      {/* ヘッダー */}
+      <div className="bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <div className="flex-1" />
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground">
-                AnkiPocket
-              </h1>
-              <p className="text-muted-foreground">
-                英単語を入力して、意味と画像を自動生成してAnkiに送信
-              </p>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  AnkiPocket
+                </h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Smart vocabulary learning
+                </p>
+              </div>
             </div>
-            <div className="flex-1 flex justify-end">
-              <Link href="/settings">
-                <Button variant="outline" size="icon">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
+            <Link href="/settings">
+              <Button variant="outline" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
+        </div>
+      </div>
+
+      {/* メインコンテンツ */}
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="text-center py-6">
+          <h2 className="text-lg text-gray-700 dark:text-gray-300">
+            英単語を入力して、意味と画像を自動生成してAnkiに送信
+          </h2>
           {currentDomain && (
-            <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-              <strong>現在のドメイン:</strong> {currentDomain}
-              <br />
-              <strong>AnkiConnect CORS設定:</strong> webCorsOriginList に "
-              {currentDomain}" を追加してください
+            <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
+              <div className="text-center">
+                <span className="font-medium">AnkiConnect 設定確認</span>
+              </div>
+              <p className="mt-2">
+                <strong>現在のドメイン:</strong> {currentDomain}<br />
+                <strong>CORS設定:</strong> webCorsOriginList に "{currentDomain}" を追加してください
+              </p>
             </div>
           )}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>単語入力</CardTitle>
-            <CardDescription>
+        {/* 単語入力カード */}
+        <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
+              単語を入力
+            </CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">
               学習したい英単語を入力してください
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex gap-2">
+          <CardContent className="space-y-4">
+            <div className="flex gap-3">
               <Input
                 placeholder="例: beautiful"
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && fetchDefinition()}
-                className="flex-1"
+                className="flex-1 h-11 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
               />
               <Button
                 onClick={fetchDefinition}
                 disabled={loading || !word.trim()}
+                className="h-11 px-6 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
               >
                 {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   "検索"
                 )}
@@ -419,48 +438,63 @@ export default function AnkiVocabularyApp() {
         </Card>
 
         {definition && (
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                {definition.word}
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <span className="text-blue-600 dark:text-blue-400 font-bold">
+                  {definition.word}
+                </span>
                 {definition.phonetic && (
-                  <Badge variant="secondary" className="text-sm">
+                  <Badge variant="secondary" className="font-mono text-sm">
                     <Volume2 className="h-3 w-3 mr-1" />
                     {definition.phonetic}
                   </Badge>
                 )}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
               {definition.meanings.map((meaning, index) => (
-                <div key={index} className="space-y-4">
-                  <Badge variant="outline">{meaning.partOfSpeech}</Badge>
-                  <p className="text-foreground">
+                <div key={index} className="space-y-3 p-4 rounded bg-blue-50 dark:bg-gray-700/50 border border-blue-100 dark:border-gray-600">
+                  <Badge variant="outline" className="text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600">
+                    {meaning.partOfSpeech}
+                  </Badge>
+                  <p className="text-gray-800 dark:text-gray-200">
                     {meaning.definitions[0].definition}
                   </p>
                   {meaning.definitions[0].example && (
-                    <p className="text-muted-foreground italic">
-                      例文: "{meaning.definitions[0].example}"
-                    </p>
+                    <div className="bg-blue-100 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-400">
+                      <p className="text-blue-800 dark:text-blue-200 italic text-sm">
+                        例文: "{meaning.definitions[0].example}"
+                      </p>
+                    </div>
                   )}
                 </div>
               ))}
 
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-3 pt-4">
                 <Button
                   variant="outline"
                   onClick={generateImage}
                   disabled={imageLoading}
-                  className="flex-1 bg-transparent"
+                  className="flex-1 h-11 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
                 >
                   {imageLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      画像生成中...
+                    </>
                   ) : (
-                    <ImageIcon className="h-4 w-4 mr-2" />
+                    <>
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      画像を生成
+                    </>
                   )}
-                  画像生成
                 </Button>
-                <Button onClick={sendToAnki} className="flex-1">
+                <Button
+                  onClick={sendToAnki}
+                  disabled={!definition}
+                  className="flex-1 h-11 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                >
                   <Send className="h-4 w-4 mr-2" />
                   Ankiに送信
                 </Button>
@@ -470,15 +504,17 @@ export default function AnkiVocabularyApp() {
         )}
 
         {imageUrl && (
-          <Card>
-            <CardHeader>
-              <CardTitle>生成された画像</CardTitle>
+          <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
+            <CardHeader className="text-center">
+              <CardTitle className="text-lg text-blue-600 dark:text-blue-400">
+                生成された画像
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <img
                 src={imageUrl || "/placeholder.svg"}
                 alt={word}
-                className="w-full max-w-sm mx-auto rounded-lg border"
+                className="w-full max-w-md mx-auto rounded border border-blue-200 dark:border-gray-600"
                 crossOrigin="anonymous"
               />
             </CardContent>
