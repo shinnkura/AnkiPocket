@@ -11,8 +11,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Volume2, ImageIcon, Send } from "lucide-react";
+import { Loader2, Volume2, ImageIcon, Send, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface WordDefinition {
   word: string;
@@ -26,6 +27,14 @@ interface WordDefinition {
   }>;
 }
 
+interface Settings {
+  deckName: string;
+}
+
+const DEFAULT_SETTINGS: Settings = {
+  deckName: "English Vocabulary",
+};
+
 export default function AnkiVocabularyApp() {
   const [word, setWord] = useState("");
   const [definition, setDefinition] = useState<WordDefinition | null>(null);
@@ -33,11 +42,23 @@ export default function AnkiVocabularyApp() {
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [currentDomain, setCurrentDomain] = useState("");
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const { toast } = useToast();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCurrentDomain(window.location.origin);
+
+      // localStorageから設定を読み込み
+      const savedSettings = localStorage.getItem("ankiPocketSettings");
+      if (savedSettings) {
+        try {
+          const parsed = JSON.parse(savedSettings);
+          setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+        } catch (error) {
+          console.error("設定の読み込みエラー:", error);
+        }
+      }
     }
   }, []);
 
@@ -282,7 +303,7 @@ export default function AnkiVocabularyApp() {
         version: 6,
         params: {
           note: {
-            deckName: "English Vocabulary",
+            deckName: settings.deckName,
             modelName: modelName,
             fields: fields,
             tags: ["vocabulary", "english", "auto-generated"],
@@ -339,12 +360,24 @@ export default function AnkiVocabularyApp() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-foreground">
-            Anki単語登録アプリ
-          </h1>
-          <p className="text-muted-foreground">
-            英単語を入力して、意味と画像を自動生成してAnkiに送信
-          </p>
+          <div className="flex justify-between items-center">
+            <div className="flex-1" />
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-foreground">
+                Anki単語登録アプリ
+              </h1>
+              <p className="text-muted-foreground">
+                英単語を入力して、意味と画像を自動生成してAnkiに送信
+              </p>
+            </div>
+            <div className="flex-1 flex justify-end">
+              <Link href="/settings">
+                <Button variant="outline" size="icon">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
           {currentDomain && (
             <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
               <strong>現在のドメイン:</strong> {currentDomain}
