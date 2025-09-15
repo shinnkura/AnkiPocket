@@ -1,0 +1,14 @@
+
+> my-v0-project@0.1.0 dev
+> next dev
+
+   [1m[38;2;173;127;168m▲ Next.js 15.5.3[39m[22m
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.42:3001
+   - Environments: .env
+
+ [32m[1m✓[22m[39m Starting...
+ [32m[1m✓[22m[39m Ready in 1292ms
+ [32m[1m✓[22m[39m Compiled /api/translate in 355ms (296 modules)
+ GET /api/translate?text=it%20is%20a%20piece%20of%20cake&from=en&to=ja [32m200[39m in 2977ms
+[?25h

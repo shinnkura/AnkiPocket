@@ -71,17 +71,49 @@ export default function AnkiVocabularyApp() {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-      );
-      if (!response.ok) throw new Error("単語が見つかりませんでした");
+      // 文章かどうかの判定（スペースが含まれている、または複数の単語）
+      const isPhrase = word.trim().includes(' ') || word.trim().split(/\s+/).length > 1;
 
-      const data = await response.json();
-      setDefinition(data[0]);
+      if (isPhrase) {
+        // 文章の場合は翻訳APIを使用
+        const response = await fetch(
+          `/api/translate?text=${encodeURIComponent(word)}&from=en&to=ja`
+        );
+
+        if (!response.ok) {
+          throw new Error("翻訳に失敗しました");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "翻訳に失敗しました");
+        }
+
+        setTranslatedText(data.translatedText);
+        toast({
+          title: "翻訳完了",
+          description: `「${word}」を翻訳しました`,
+        });
+      } else {
+        // 単語の場合は辞書APIを使用
+        const response = await fetch(
+          `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+        );
+        if (!response.ok) throw new Error("単語が見つかりませんでした");
+
+        const data = await response.json();
+        setDefinition(data[0]);
+
+        toast({
+          title: "検索完了",
+          description: `「${word}」の意味を取得しました`,
+        });
+      }
     } catch (error) {
       toast({
         title: "エラー",
-        description: "単語の意味を取得できませんでした。",
+        description: "検索に失敗しました。単語または文章を確認してください。",
         variant: "destructive",
       });
     } finally {
@@ -642,7 +674,7 @@ export default function AnkiVocabularyApp() {
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  "検索"
+                  "検索・翻訳"
                 )}
               </Button>
               <Button
