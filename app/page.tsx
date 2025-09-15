@@ -77,17 +77,22 @@ export default function AnkiVocabularyApp() {
 
       if (isPhrase) {
         // 文章の場合は翻訳APIを使用
+        console.log('Calling translation API for phrase:', word);
         const response = await fetch(
           `/api/translate?text=${encodeURIComponent(word)}&from=en&to=ja`
         );
 
+        console.log('Translation API response status:', response.status);
         if (!response.ok) {
-          throw new Error("翻訳に失敗しました");
+          console.error('Translation API failed:', response.status, response.statusText);
+          throw new Error(`翻訳に失敗しました (${response.status})`);
         }
 
         const data = await response.json();
+        console.log('Translation API response data:', data);
 
         if (!data.success) {
+          console.error('Translation API returned error:', data.error);
           throw new Error(data.error || "翻訳に失敗しました");
         }
 
@@ -100,12 +105,19 @@ export default function AnkiVocabularyApp() {
         });
       } else {
         // 単語の場合は辞書APIを使用
+        console.log('Calling dictionary API for word:', word);
         const response = await fetch(
           `/api/dictionary?word=${encodeURIComponent(word)}`
         );
-        if (!response.ok) throw new Error("単語が見つかりませんでした");
+
+        console.log('Dictionary API response status:', response.status);
+        if (!response.ok) {
+          console.error('Dictionary API failed:', response.status, response.statusText);
+          throw new Error(`単語が見つかりませんでした (${response.status})`);
+        }
 
         const data = await response.json();
+        console.log('Dictionary API response data:', data);
         setDefinition(data.definitions[0]);
         setTranslatedText(""); // 翻訳結果をクリア
         console.log('Dictionary result:', data.definitions[0]);
@@ -116,9 +128,10 @@ export default function AnkiVocabularyApp() {
         });
       }
     } catch (error) {
+      console.error('fetchDefinition error:', error);
       toast({
         title: "エラー",
-        description: "検索に失敗しました。単語または文章を確認してください。",
+        description: `検索に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
         variant: "destructive",
       });
     } finally {

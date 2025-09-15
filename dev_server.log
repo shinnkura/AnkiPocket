@@ -3,14 +3,11 @@
 > next dev
 
    [1m[38;2;173;127;168m▲ Next.js 15.5.3[39m[22m
-   - Local:        http://localhost:3002
-   - Network:      http://192.168.1.42:3002
+   - Local:        http://localhost:3003
+   - Network:      http://192.168.1.42:3003
    - Environments: .env
 
  [32m[1m✓[22m[39m Starting...
- [32m[1m✓[22m[39m Ready in 1321ms
- [32m[1m✓[22m[39m Compiled /api/dictionary in 468ms (296 modules)
- GET /api/dictionary?word=beautiful [32m200[39m in 645ms
- [32m[1m✓[22m[39m Compiled /api/translate in 157ms (298 modules)
- GET /api/translate?text=it%20is%20a%20piece%20of%20cake&from=en&to=ja [32m200[39m in 3181ms
-[?25h
+ [32m[1m✓[22m[39m Ready in 1065ms
+ [32m[1m✓[22m[39m Compiled /api/translate in 354ms (296 modules)
+ GET /api/translate?text=it%20is%20a%20piece%20of%20cake&from=en&to=ja [32m200[39m in 2959ms
