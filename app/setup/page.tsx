@@ -51,7 +51,8 @@ export default function AnkiConnectSetupPage() {
   const setupSteps = [
     {
       title: "Ankiアプリケーションの起動",
-      description: "まず、お使いのコンピューターでAnkiデスクトップアプリケーションを起動してください。",
+      description:
+        "まず、お使いのコンピューターでAnkiデスクトップアプリケーションを起動してください。",
       content: (
         <div className="space-y-4">
           <div className="flex items-center space-x-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -63,7 +64,9 @@ export default function AnkiConnectSetupPage() {
           <ul className="space-y-2 text-sm">
             <li className="flex items-center space-x-2">
               <CheckCircle2 className="h-4 w-4 text-green-500" />
-              <span>Windows、Mac、LinuxのいずれかのAnkiデスクトップ版を使用してください</span>
+              <span>
+                Windows、Mac、LinuxのいずれかのAnkiデスクトップ版を使用してください
+              </span>
             </li>
             <li className="flex items-center space-x-2">
               <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -79,18 +82,22 @@ export default function AnkiConnectSetupPage() {
       content: (
         <div className="space-y-4">
           <div className="space-y-3">
-            <p className="text-sm font-medium">1. Ankiのメニューから「ツール」→「アドオン」を選択</p>
+            <p className="text-sm font-medium">
+              1. Ankiのメニューから「ツール」→「アドオン」を選択
+            </p>
             <img
               src="/setup/anki-tools-menu.png"
               alt="Ankiツールメニュー"
               className="w-full max-w-md border border-gray-200 dark:border-gray-600 rounded-lg"
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).style.display = "none";
               }}
             />
           </div>
           <div className="space-y-3">
-            <p className="text-sm font-medium">2. 「アドオンを入手」ボタンをクリック</p>
+            <p className="text-sm font-medium">
+              2. 「アドオンを入手」ボタンをクリック
+            </p>
             <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
               <span className="text-sm font-medium">アドオンコード:</span>
               <code className="bg-white dark:bg-gray-800 px-3 py-1 rounded font-mono text-sm border">
@@ -114,7 +121,9 @@ export default function AnkiConnectSetupPage() {
             </p>
           </div>
           <div className="space-y-3">
-            <p className="text-sm font-medium">3. 「OK」ボタンをクリックしてインストール</p>
+            <p className="text-sm font-medium">
+              3. 「OK」ボタンをクリックしてインストール
+            </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               アドオンのダウンロードと有効化が自動的に行われます。
             </p>
@@ -124,11 +133,14 @@ export default function AnkiConnectSetupPage() {
     },
     {
       title: "CORS設定の追加",
-      description: "AnkiConnectがウェブアプリケーションからのアクセスを許可するように設定します。",
+      description:
+        "AnkiConnectがウェブアプリケーションからのアクセスを許可するように設定します。",
       content: (
         <div className="space-y-4">
           <div className="space-y-3">
-            <p className="text-sm font-medium">1. アドオン一覧で「AnkiConnect」を選択し、「設定」をクリック</p>
+            <p className="text-sm font-medium">
+              1. アドオン一覧で「AnkiConnect」を選択し、「設定」をクリック
+            </p>
           </div>
           <div className="space-y-3">
             <p className="text-sm font-medium">2. 設定ファイルに以下を追加</p>
@@ -137,9 +149,15 @@ export default function AnkiConnectSetupPage() {
                 <div>&#123;</div>
                 <div className="pl-4">"apiKey": null,</div>
                 <div className="pl-4">"apiLogPath": null,</div>
-                <div className="pl-4 text-yellow-400">"webCorsOriginList": [</div>
-                <div className="pl-8 text-yellow-400">"http://localhost:3000",</div>
-                <div className="pl-8 text-yellow-400">"https://your-domain.com"</div>
+                <div className="pl-4 text-yellow-400">
+                  "webCorsOriginList": [
+                </div>
+                <div className="pl-8 text-yellow-400">
+                  "http://localhost:3000",
+                </div>
+                <div className="pl-8 text-yellow-400">
+                  "https://your-domain.com"
+                </div>
                 <div className="pl-4 text-yellow-400">]</div>
                 <div>&#125;</div>
               </div>
@@ -148,10 +166,12 @@ export default function AnkiConnectSetupPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(
-                  '{\n    "apiKey": null,\n    "apiLogPath": null,\n    "webCorsOriginList": [\n        "http://localhost:3000",\n        "https://your-domain.com"\n    ]\n}',
-                  "CORS設定"
-                )}
+                onClick={() =>
+                  copyToClipboard(
+                    '{\n    "apiKey": null,\n    "apiLogPath": null,\n    "webCorsOriginList": [\n        "http://localhost:3000",\n        "https://your-domain.com"\n    ]\n}',
+                    "CORS設定"
+                  )
+                }
                 className="text-xs"
               >
                 {copiedText === "CORS設定" ? (
@@ -164,12 +184,15 @@ export default function AnkiConnectSetupPage() {
             </div>
             <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>重要:</strong> "https://your-domain.com"の部分は、実際にアプリケーションを使用するドメインに変更してください。
+                <strong>重要:</strong>{" "}
+                "https://your-domain.com"の部分は、実際にアプリケーションを使用するドメインに変更してください。
               </p>
             </div>
           </div>
           <div className="space-y-3">
-            <p className="text-sm font-medium">3. 「OK」をクリックして設定を保存</p>
+            <p className="text-sm font-medium">
+              3. 「OK」をクリックして設定を保存
+            </p>
           </div>
         </div>
       ),
@@ -180,18 +203,26 @@ export default function AnkiConnectSetupPage() {
       content: (
         <div className="space-y-4">
           <div className="space-y-3">
-            <p className="text-sm">AnkiConnectの設定を完了するために、以下の手順を実行してください：</p>
+            <p className="text-sm">
+              AnkiConnectの設定を完了するために、以下の手順を実行してください：
+            </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">1</span>
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  1
+                </span>
                 <span>Ankiアプリケーションを完全に終了</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">2</span>
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  2
+                </span>
                 <span>Ankiを再度起動</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">3</span>
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  3
+                </span>
                 <span>AnkiConnectが正常に読み込まれることを確認</span>
               </li>
             </ul>
@@ -216,15 +247,21 @@ export default function AnkiConnectSetupPage() {
             <p className="text-sm font-medium">接続テストの手順：</p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">1</span>
+                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  1
+                </span>
                 <span>Ankiが起動していることを確認</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">2</span>
+                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  2
+                </span>
                 <span>AnkiPocketに戻って単語を検索</span>
               </li>
               <li className="flex items-center space-x-2">
-                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">3</span>
+                <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-medium">
+                  3
+                </span>
                 <span>「Ankiに送信」ボタンをクリック</span>
               </li>
             </ul>
@@ -273,8 +310,78 @@ export default function AnkiConnectSetupPage() {
 
       {/* メインコンテンツ */}
       <div className="max-w-4xl mx-auto p-6">
+        {/* ステップナビゲーション */}
+        <div className="mb-6">
+          <div className="flex flex-wrap justify-center space-x-2 mb-4">
+            {setupSteps.map((_, index) => (
+              <Button
+                key={index}
+                variant={currentStep === index ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCurrentStep(index)}
+                className="mb-2"
+              >
+                {index + 1}
+              </Button>
+            ))}
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div
+              className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
+              style={{
+                width: `${((currentStep + 1) / setupSteps.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* 現在のステップ */}
+        <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
+          <CardHeader>
+            <div className="flex items-center space-x-3">
+              <Badge variant="default" className="bg-blue-600 dark:bg-blue-400">
+                ステップ {currentStep + 1}
+              </Badge>
+              <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
+                {setupSteps[currentStep].title}
+              </CardTitle>
+            </div>
+            <CardDescription>
+              {setupSteps[currentStep].description}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>{setupSteps[currentStep].content}</CardContent>
+        </Card>
+
+        {/* ナビゲーションボタン */}
+        <div className="flex justify-between mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+            disabled={currentStep === 0}
+          >
+            前のステップ
+          </Button>
+          {currentStep === setupSteps.length - 1 ? (
+            <Link href="/">
+              <Button className="bg-green-600 hover:bg-green-700">
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                セットアップ完了
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              onClick={() =>
+                setCurrentStep(Math.min(setupSteps.length - 1, currentStep + 1))
+              }
+            >
+              次のステップ
+            </Button>
+          )}
+        </div>
+
         {/* 概要カード */}
-        <Card className="mb-6 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
+        <Card className="mt-8 mb-6 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
               <Wifi className="h-5 w-5" />
@@ -300,7 +407,9 @@ export default function AnkiConnectSetupPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">アドオンコード</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Ankiでのインストール時に使用</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Ankiでのインストール時に使用
+                </p>
               </div>
               <Badge variant="secondary" className="font-mono">
                 2055492159
@@ -308,74 +417,6 @@ export default function AnkiConnectSetupPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* ステップナビゲーション */}
-        <div className="mb-6">
-          <div className="flex flex-wrap justify-center space-x-2 mb-4">
-            {setupSteps.map((_, index) => (
-              <Button
-                key={index}
-                variant={currentStep === index ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentStep(index)}
-                className="mb-2"
-              >
-                {index + 1}
-              </Button>
-            ))}
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div
-              className="bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentStep + 1) / setupSteps.length) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* 現在のステップ */}
-        <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
-          <CardHeader>
-            <div className="flex items-center space-x-3">
-              <Badge variant="default" className="bg-blue-600 dark:bg-blue-400">
-                ステップ {currentStep + 1}
-              </Badge>
-              <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
-                {setupSteps[currentStep].title}
-              </CardTitle>
-            </div>
-            <CardDescription>
-              {setupSteps[currentStep].description}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {setupSteps[currentStep].content}
-          </CardContent>
-        </Card>
-
-        {/* ナビゲーションボタン */}
-        <div className="flex justify-between mt-6">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-            disabled={currentStep === 0}
-          >
-            前のステップ
-          </Button>
-          {currentStep === setupSteps.length - 1 ? (
-            <Link href="/">
-              <Button className="bg-green-600 hover:bg-green-700">
-                <CheckCircle2 className="h-4 w-4 mr-2" />
-                セットアップ完了
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              onClick={() => setCurrentStep(Math.min(setupSteps.length - 1, currentStep + 1))}
-            >
-              次のステップ
-            </Button>
-          )}
-        </div>
 
         {/* トラブルシューティング */}
         <Card className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
@@ -387,18 +428,26 @@ export default function AnkiConnectSetupPage() {
           </CardHeader>
           <CardContent className="text-sm space-y-3">
             <div>
-              <p className="font-medium text-yellow-800 dark:text-yellow-200">接続エラーが発生する場合：</p>
+              <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                接続エラーが発生する場合：
+              </p>
               <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-300">
                 <li>Ankiデスクトップアプリが起動していることを確認</li>
-                <li>AnkiConnectアドオン（2055492159）がインストールされていることを確認</li>
+                <li>
+                  AnkiConnectアドオン（2055492159）がインストールされていることを確認
+                </li>
                 <li>CORS設定にあなたのドメインが追加されていることを確認</li>
                 <li>Ankiを完全に再起動</li>
               </ul>
             </div>
             <div>
-              <p className="font-medium text-yellow-800 dark:text-yellow-200">その他の問題：</p>
+              <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                その他の問題：
+              </p>
               <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-300">
-                <li>アンチウイルスソフトがポート8765をブロックしていないか確認</li>
+                <li>
+                  アンチウイルスソフトがポート8765をブロックしていないか確認
+                </li>
                 <li>ファイアウォールの設定を確認</li>
                 <li>AnkiConnectアドオンを一度無効にしてから再度有効にする</li>
               </ul>
@@ -409,7 +458,9 @@ export default function AnkiConnectSetupPage() {
         {/* 参考リンク */}
         <Card className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-700 dark:text-gray-300">参考リンク</CardTitle>
+            <CardTitle className="text-gray-700 dark:text-gray-300">
+              参考リンク
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
