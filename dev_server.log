@@ -11,3 +11,20 @@
  [32m[1m✓[22m[39m Ready in 1065ms
  [32m[1m✓[22m[39m Compiled /api/translate in 354ms (296 modules)
  GET /api/translate?text=it%20is%20a%20piece%20of%20cake&from=en&to=ja [32m200[39m in 2959ms
+ [37m[1m○[22m[39m Compiling / ...
+ [32m[1m✓[22m[39m Compiled / in 619ms (695 modules)
+ GET / [32m200[39m in 882ms
+ [32m[1m✓[22m[39m Compiled /api/dictionary in 229ms (714 modules)
+ GET /api/dictionary?word=apple [32m200[39m in 378ms
+ GET / [32m200[39m in 213ms
+ GET /api/dictionary?word=apple [32m200[39m in 126ms
+ GET / [32m200[39m in 77ms
+ GET /api/dictionary?word=apple [32m200[39m in 86ms
+ [32m[1m✓[22m[39m Compiled in 1033ms (728 modules)
+ GET / [32m200[39m in 108ms
+ [33m[1m⚠[22m[39m Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / [32m200[39m in 146ms
+ [32m[1m✓[22m[39m Compiled /_not-found in 202ms (719 modules)
+ GET /api/dictionary?word=beautiful [33m404[39m in 328ms
+ GET /api/dictionary?word=beautiful [32m200[39m in 69ms
+ GET /api/dictionary?word=apple [32m200[39m in 109ms

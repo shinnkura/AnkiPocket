@@ -747,7 +747,19 @@ export default function AnkiVocabularyApp() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {definition.meanings.map((meaning, index) => (
+              {definition.meanings
+                .filter((meaning) => {
+                  // 主要な品詞のみ表示（稀な動詞用法を除外）
+                  const commonParts = ['noun', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'];
+                  const isCommonVerb = meaning.partOfSpeech === 'verb' &&
+                    meaning.definitions.some(def =>
+                      def.definition.length > 30 && // 短すぎる定義は稀な用法の可能性
+                      !def.definition.toLowerCase().includes('to become') && // "To become X-like" のような稀な用法を除外
+                      !def.definition.toLowerCase().includes('to form') // "To form X" のような稀な用法を除外
+                    );
+                  return commonParts.includes(meaning.partOfSpeech) || isCommonVerb;
+                })
+                .map((meaning, index) => (
                 <div key={index} className="space-y-3 p-4 rounded bg-blue-50 dark:bg-gray-700/50 border border-blue-100 dark:border-gray-600">
                   <Badge variant="outline" className="text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600">
                     {meaning.partOfSpeech}
