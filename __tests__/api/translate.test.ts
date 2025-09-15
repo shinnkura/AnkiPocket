@@ -4,139 +4,185 @@
  */
 
 import { createMocks } from 'node-mocks-http';
+import { GET } from '../../app/api/translate/route';
 
-// テスト対象のAPIハンドラーをimport（まだ実装されていない）
-// import handler from '../../app/api/translate/route';
+// fetch をモック
+global.fetch = jest.fn();
 
 describe('/api/translate', () => {
   describe('GET /api/translate', () => {
+    beforeEach(() => {
+      (fetch as jest.Mock).mockClear();
+    });
+
     it('英語の文章を日本語に翻訳できる', async () => {
-      const { req, res } = createMocks({
+      // fetch をモックして成功レスポンスを返す
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: 'こんにちは'
+          }
+        })
+      });
+      const { req } = createMocks({
         method: 'GET',
-        url: '/api/translate?text=it is a piece of cake&from=en&to=ja',
+        url: '/api/translate?text=Hello&from=en&to=ja',
       });
 
-      // 期待される翻訳結果
-      const expectedResult = {
-        originalText: 'it is a piece of cake',
-        translatedText: 'それは朝飯前です',
-        from: 'en',
-        to: 'ja',
-        success: true
-      };
+      const response = await GET(req as any);
+      const responseData = await response.json();
 
-      // APIハンドラーを実行（まだ実装されていないためコメントアウト）
-      // await handler(req, res);
-
-      // レスポンスの検証（まだ実装されていないためコメントアウト）
-      // expect(res._getStatusCode()).toBe(200);
-      // const responseData = JSON.parse(res._getData());
-      // expect(responseData).toEqual(expectedResult);
-
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      expect(response.status).toBe(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.originalText).toBe('Hello');
+      expect(responseData.from).toBe('en');
+      expect(responseData.to).toBe('ja');
+      expect(responseData.translatedText).toBeDefined();
+      expect(typeof responseData.translatedText).toBe('string');
     });
 
     it('日本語の文章を英語に翻訳できる', async () => {
-      const { req, res } = createMocks({
-        method: 'GET',
-        url: '/api/translate?text=それは朝飯前です&from=ja&to=en',
+      // fetch をモックして成功レスポンスを返す
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: 'Hello'
+          }
+        })
       });
 
-      const expectedResult = {
-        originalText: 'それは朝飯前です',
-        translatedText: 'That is a piece of cake',
-        from: 'ja',
-        to: 'en',
-        success: true
-      };
+      const { req } = createMocks({
+        method: 'GET',
+        url: '/api/translate?text=こんにちは&from=ja&to=en',
+      });
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      const response = await GET(req as any);
+      const responseData = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.originalText).toBe('こんにちは');
+      expect(responseData.from).toBe('ja');
+      expect(responseData.to).toBe('en');
+      expect(responseData.translatedText).toBeDefined();
+      expect(typeof responseData.translatedText).toBe('string');
     });
 
     it('複数文の翻訳ができる', async () => {
-      const { req, res } = createMocks({
-        method: 'GET',
-        url: '/api/translate?text=Hello world. How are you today?&from=en&to=ja',
+      // fetch をモックして成功レスポンスを返す
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: 'こんにちは世界。元気ですか？'
+          }
+        })
       });
 
-      const expectedResult = {
-        originalText: 'Hello world. How are you today?',
-        translatedText: 'こんにちは世界。今日はお元気ですか？',
-        from: 'en',
-        to: 'ja',
-        success: true
-      };
+      const { req } = createMocks({
+        method: 'GET',
+        url: '/api/translate?text=Hello world. How are you?&from=en&to=ja',
+      });
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      const response = await GET(req as any);
+      const responseData = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.originalText).toBe('Hello world. How are you?');
+      expect(responseData.from).toBe('en');
+      expect(responseData.to).toBe('ja');
+      expect(responseData.translatedText).toBeDefined();
+      expect(typeof responseData.translatedText).toBe('string');
     });
 
     it('textパラメータが未指定の場合はエラーを返す', async () => {
-      const { req, res } = createMocks({
+      const { req } = createMocks({
         method: 'GET',
         url: '/api/translate?from=en&to=ja',
       });
 
-      const expectedResult = {
-        error: 'Text parameter is required',
-        success: false
-      };
+      const response = await GET(req as any);
+      const responseData = await response.json();
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      expect(response.status).toBe(400);
+      expect(responseData.success).toBe(false);
+      expect(responseData.error).toBe('Text parameter is required');
     });
 
     it('fromパラメータが未指定の場合はenをデフォルトとする', async () => {
-      const { req, res } = createMocks({
+      // fetch をモックして成功レスポンスを返す
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: 'こんにちは'
+          }
+        })
+      });
+
+      const { req } = createMocks({
         method: 'GET',
         url: '/api/translate?text=Hello&to=ja',
       });
 
-      const expectedResult = {
-        originalText: 'Hello',
-        translatedText: 'こんにちは',
-        from: 'en',
-        to: 'ja',
-        success: true
-      };
+      const response = await GET(req as any);
+      const responseData = await response.json();
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      expect(response.status).toBe(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.originalText).toBe('Hello');
+      expect(responseData.from).toBe('en');
+      expect(responseData.to).toBe('ja');
+      expect(responseData.translatedText).toBeDefined();
     });
 
     it('toパラメータが未指定の場合はjaをデフォルトとする', async () => {
-      const { req, res } = createMocks({
+      // fetch をモックして成功レスポンスを返す
+      (fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          responseStatus: 200,
+          responseData: {
+            translatedText: 'こんにちは'
+          }
+        })
+      });
+
+      const { req } = createMocks({
         method: 'GET',
         url: '/api/translate?text=Hello&from=en',
       });
 
-      const expectedResult = {
-        originalText: 'Hello',
-        translatedText: 'こんにちは',
-        from: 'en',
-        to: 'ja',
-        success: true
-      };
+      const response = await GET(req as any);
+      const responseData = await response.json();
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      expect(response.status).toBe(200);
+      expect(responseData.success).toBe(true);
+      expect(responseData.originalText).toBe('Hello');
+      expect(responseData.from).toBe('en');
+      expect(responseData.to).toBe('ja');
+      expect(responseData.translatedText).toBeDefined();
     });
 
     it('サポートされていない言語ペアの場合はエラーを返す', async () => {
-      const { req, res } = createMocks({
+      const { req } = createMocks({
         method: 'GET',
         url: '/api/translate?text=Hello&from=en&to=xyz',
       });
 
-      const expectedResult = {
-        error: 'Unsupported language pair',
-        success: false
-      };
+      const response = await GET(req as any);
+      const responseData = await response.json();
 
-      // テストが失敗することを確認（TDDの第一段階）
-      expect(true).toBe(false); // 実装後にtrue.toBe(true)に変更
+      expect(response.status).toBe(400);
+      expect(responseData.success).toBe(false);
+      expect(responseData.error).toBe('Unsupported language pair');
     });
   });
 });

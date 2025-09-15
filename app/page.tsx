@@ -45,6 +45,8 @@ export default function AnkiVocabularyApp() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [imageQuery, setImageQuery] = useState("");
   const [showImageQueryInput, setShowImageQueryInput] = useState(false);
+  const [translatedText, setTranslatedText] = useState("");
+  const [translateLoading, setTranslateLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -84,6 +86,41 @@ export default function AnkiVocabularyApp() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const translateText = async () => {
+    if (!word.trim()) return;
+
+    setTranslateLoading(true);
+    try {
+      const response = await fetch(
+        `/api/translate?text=${encodeURIComponent(word)}&from=en&to=ja`
+      );
+
+      if (!response.ok) {
+        throw new Error("翻訳に失敗しました");
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "翻訳に失敗しました");
+      }
+
+      setTranslatedText(data.translatedText);
+      toast({
+        title: "翻訳完了",
+        description: `「${word}」を翻訳しました`,
+      });
+    } catch (error) {
+      toast({
+        title: "翻訳エラー",
+        description: "文章の翻訳に失敗しました。",
+        variant: "destructive",
+      });
+    } finally {
+      setTranslateLoading(false);
     }
   };
 
@@ -402,6 +439,7 @@ export default function AnkiVocabularyApp() {
       setWord("");
       setDefinition(null);
       setImageUrl("");
+      setTranslatedText("");
     } catch (error) {
       console.error("Anki送信エラーの詳細:", error);
 
@@ -562,7 +600,7 @@ export default function AnkiVocabularyApp() {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center py-6">
           <h2 className="text-lg text-gray-700 dark:text-gray-300">
-            英単語を入力して、意味と画像を自動生成してAnkiに送信
+            英単語や文章を入力して、意味の取得・翻訳・画像生成をしてAnkiに送信
           </h2>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
@@ -581,16 +619,16 @@ export default function AnkiVocabularyApp() {
         <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader className="text-center">
             <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
-              単語を入力
+              単語・文章を入力
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              学習したい英単語を入力してください
+              学習したい英単語や文章を入力してください
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-3">
               <Input
-                placeholder="例: beautiful"
+                placeholder="例: beautiful または it is a piece of cake"
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && fetchDefinition()}
@@ -607,9 +645,41 @@ export default function AnkiVocabularyApp() {
                   "検索"
                 )}
               </Button>
+              <Button
+                onClick={translateText}
+                disabled={translateLoading || !word.trim()}
+                variant="outline"
+                className="h-11 px-6 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
+              >
+                {translateLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  "翻訳"
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
+
+        {translatedText && (
+          <Card className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-700">
+            <CardHeader>
+              <CardTitle className="text-xl text-green-600 dark:text-green-400">
+                翻訳結果
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="p-4 rounded bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">原文:</p>
+                  <p className="text-gray-800 dark:text-gray-200 mb-3">{word}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">翻訳:</p>
+                  <p className="text-gray-800 dark:text-gray-200 font-medium">{translatedText}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {definition && (
           <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
