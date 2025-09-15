@@ -28,3 +28,66 @@
  GET /api/dictionary?word=beautiful [33m404[39m in 328ms
  GET /api/dictionary?word=beautiful [32m200[39m in 69ms
  GET /api/dictionary?word=apple [32m200[39m in 109ms
+ GET /api/dictionary?word=apple [32m200[39m in 99ms
+ GET /api/dictionary?word=run [32m200[39m in 97ms
+ [32m[1m✓[22m[39m Compiled /api/unsplash in 266ms (716 modules)
+Image generation request for: run
+Environment variables check:
+- UNSPLASH_ACCESS_KEY exists: [33mtrue[39m
+- Using hardcoded key: [33mfalse[39m
+- Final key length: [33m43[39m
+Attempting Unsplash API call
+Unsplash API response status: [33m200[39m
+Unsplash API response: [33m1[39m results
+Unsplash image found
+ GET /api/unsplash?query=run [32m200[39m in 681ms
+ GET /api/dictionary?word=beautiful [32m200[39m in 119ms
+Image generation request for: beautiful
+Environment variables check:
+- UNSPLASH_ACCESS_KEY exists: [33mtrue[39m
+- Using hardcoded key: [33mfalse[39m
+- Final key length: [33m43[39m
+Attempting Unsplash API call
+Unsplash API response status: [33m200[39m
+Unsplash API response: [33m1[39m results
+Unsplash image found
+ GET /api/unsplash?query=beautiful [32m200[39m in 55ms
+ [32m[1m✓[22m[39m Compiled in 279ms (296 modules)
+ GET / [32m200[39m in 95ms
+ [32m[1m✓[22m[39m Compiled in 154ms (296 modules)
+ GET / [32m200[39m in 34ms
+ GET / [32m200[39m in 63ms
+ [32m[1m✓[22m[39m Compiled in 374ms (695 modules)
+ GET / [32m200[39m in 132ms
+ [32m[1m✓[22m[39m Compiled in 336ms (709 modules)
+ GET / [32m200[39m in 86ms
+ [32m[1m✓[22m[39m Compiled in 398ms (709 modules)
+ GET / [32m200[39m in 115ms
+ [32m[1m✓[22m[39m Compiled in 296ms (709 modules)
+ GET / [32m200[39m in 63ms
+ [32m[1m✓[22m[39m Compiled in 704ms (711 modules)
+ GET / [32m200[39m in 125ms
+ [32m[1m✓[22m[39m Compiled in 296ms (711 modules)
+ GET / [32m200[39m in 109ms
+ [32m[1m✓[22m[39m Compiled /_not-found in 361ms (702 modules)
+ GET / [33m404[39m in 612ms
+ GET / [32m200[39m in 101ms
+ [32m[1m✓[22m[39m Compiled in 408ms (297 modules)
+ [32m[1m✓[22m[39m Compiled in 542ms (297 modules)
+ [32m[1m✓[22m[39m Compiled in 367ms (297 modules)
+ [32m[1m✓[22m[39m Compiled in 359ms (297 modules)
+ [32m[1m✓[22m[39m Compiled in 882ms (711 modules)
+ [32m[1m✓[22m[39m Compiled in 581ms (711 modules)
+ [32m[1m✓[22m[39m Compiled in 1105ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 882ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 697ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 375ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 375ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 275ms (723 modules)
+ [32m[1m✓[22m[39m Compiled in 759ms (751 modules)
+ [32m[1m✓[22m[39m Compiled in 393ms (317 modules)
+ [32m[1m✓[22m[39m Compiled in 273ms (317 modules)
+ [32m[1m✓[22m[39m Compiled in 253ms (317 modules)
+ [32m[1m✓[22m[39m Compiled in 296ms (317 modules)
+ [32m[1m✓[22m[39m Compiled in 599ms (317 modules)
+ [32m[1m✓[22m[39m Compiled in 691ms (317 modules)

@@ -11,9 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw } from "lucide-react";
+import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import ManualAnkiForm from "@/components/ManualAnkiForm";
 
 interface WordDefinition {
   word: string;
@@ -47,6 +48,7 @@ export default function AnkiVocabularyApp() {
   const [showImageQueryInput, setShowImageQueryInput] = useState(false);
   const [translatedText, setTranslatedText] = useState("");
   const [translateLoading, setTranslateLoading] = useState(false);
+  const [autoProcessing, setAutoProcessing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -278,6 +280,68 @@ export default function AnkiVocabularyApp() {
     setShowImageQueryInput(false);
     // 元の検索クエリに戻す
     setImageQuery(word);
+  };
+
+  const autoProcessAndSend = async () => {
+    if (!word.trim()) return;
+
+    setAutoProcessing(true);
+    try {
+      const response = await fetch("/api/auto-anki", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: word.trim(),
+          deckName: settings.deckName,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "自動処理に失敗しました");
+      }
+
+      if (result.success) {
+        // 結果を画面に反映
+        if (result.type === "word") {
+          setDefinition(result.definition);
+          setTranslatedText("");
+        } else if (result.type === "phrase") {
+          setTranslatedText(result.translatedText);
+          setDefinition(null);
+        }
+
+        if (result.imageUrl) {
+          setImageUrl(result.imageUrl);
+          setImageQuery(word);
+        }
+
+        toast({
+          title: "自動処理完了！",
+          description: `「${word}」を自動で処理してAnkiに送信しました！`,
+        });
+
+        // リセット
+        setWord("");
+        setDefinition(null);
+        setImageUrl("");
+        setTranslatedText("");
+      } else {
+        throw new Error(result.error || "自動処理に失敗しました");
+      }
+    } catch (error) {
+      console.error("Auto process error:", error);
+      toast({
+        title: "自動処理エラー",
+        description: `エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setAutoProcessing(false);
+    }
   };
 
   const sendToAnki = async () => {
@@ -652,6 +716,9 @@ export default function AnkiVocabularyApp() {
           <h2 className="text-lg text-gray-700 dark:text-gray-300">
             英単語や文章を入力して、意味の取得・翻訳・画像生成をしてAnkiに送信
           </h2>
+          <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+            ✨ 新機能：「一括処理してAnkiに送信」ボタンで、すべての処理を自動化！
+          </p>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
               <div className="text-center">
@@ -676,37 +743,60 @@ export default function AnkiVocabularyApp() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-3">
-              <Input
-                placeholder="例: beautiful または it is a piece of cake"
-                value={word}
-                onChange={(e) => setWord(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && fetchDefinition()}
-                className="flex-1 h-11 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
-              />
-              <Button
-                onClick={fetchDefinition}
-                disabled={loading || !word.trim()}
-                className="h-11 px-6 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-              >
-                {loading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  "検索・翻訳"
-                )}
-              </Button>
-              <Button
-                onClick={translateText}
-                disabled={translateLoading || !word.trim()}
-                variant="outline"
-                className="h-11 px-6 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
-              >
-                {translateLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  "翻訳"
-                )}
-              </Button>
+            <div className="space-y-3">
+              <div className="flex gap-3">
+                <Input
+                  placeholder="例: beautiful または it is a piece of cake"
+                  value={word}
+                  onChange={(e) => setWord(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && fetchDefinition()}
+                  className="flex-1 h-11 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
+                />
+                <Button
+                  onClick={fetchDefinition}
+                  disabled={loading || !word.trim()}
+                  className="h-11 px-6 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                >
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    "検索・翻訳"
+                  )}
+                </Button>
+                <Button
+                  onClick={translateText}
+                  disabled={translateLoading || !word.trim()}
+                  variant="outline"
+                  className="h-11 px-6 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  {translateLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    "翻訳"
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  onClick={autoProcessAndSend}
+                  disabled={autoProcessing || !word.trim()}
+                  className="h-12 px-8 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold"
+                  size="lg"
+                >
+                  {autoProcessing ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      自動処理中...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-5 w-5 mr-2" />
+                      一括処理してAnkiに送信
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -893,6 +983,9 @@ export default function AnkiVocabularyApp() {
             </CardContent>
           </Card>
         )}
+
+        {/* 手動入力フォーム */}
+        <ManualAnkiForm settings={settings} />
       </div>
     </div>
   );

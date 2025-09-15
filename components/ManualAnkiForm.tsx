@@ -1,0 +1,257 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Send, Upload, X, Link, FileImage } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface ManualAnkiFormProps {
+  settings: {
+    deckName: string;
+  };
+}
+
+export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
+  const [word, setWord] = useState("");
+  const [meaning, setMeaning] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState("");
+  const [imageInputType, setImageInputType] = useState<"file" | "url">("file");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImageUrlInput("");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUrlSubmit = () => {
+    if (imageUrlInput.trim()) {
+      setImageUrl(imageUrlInput.trim());
+      setImageFile(null);
+      toast({
+        title: "画像URL設定",
+        description: "画像URLが設定されました。",
+      });
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImageUrl("");
+    setImageUrlInput("");
+  };
+
+  const sendToAnki = async () => {
+    if (!word.trim() || !meaning.trim()) {
+      toast({
+        title: "入力エラー",
+        description: "単語と意味の両方を入力してください。",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/manual-anki", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          word: word.trim(),
+          meaning: meaning.trim(),
+          imageUrl: imageUrl,
+          imageFile: imageFile ? {
+            data: imageUrl.split(",")[1], // base64データ部分のみ
+            filename: `${word}_${Date.now()}.${imageFile.type.split("/")[1]}`,
+          } : null,
+          imageUrlInput: !imageFile && imageUrl ? imageUrl : null,
+          deckName: settings.deckName,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Ankiへの送信に失敗しました");
+      }
+
+      if (result.success) {
+        toast({
+          title: "成功！",
+          description: `単語「${word}」をAnkiに追加しました！${
+            imageFile ? "（画像付き）" : ""
+          }`,
+        });
+
+        // フォームをリセット
+        setWord("");
+        setMeaning("");
+        setImageUrl("");
+        setImageFile(null);
+        setImageUrlInput("");
+      } else {
+        throw new Error(result.error || "Ankiへの送信に失敗しました");
+      }
+    } catch (error) {
+      console.error("Manual Anki send error:", error);
+      toast({
+        title: "送信エラー",
+        description: `エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-gray-700">
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl text-purple-600 dark:text-purple-400">
+          手動でAnkiカードを作成
+        </CardTitle>
+        <CardDescription className="text-gray-600 dark:text-gray-400">
+          単語、意味、画像を自分で入力してAnkiに送信します
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="manual-word" className="text-sm font-medium">
+              単語 <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="manual-word"
+              placeholder="例: beautiful"
+              value={word}
+              onChange={(e) => setWord(e.target.value)}
+              className="border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="manual-meaning" className="text-sm font-medium">
+              意味 <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="manual-meaning"
+              placeholder="例: 美しい、きれいな"
+              value={meaning}
+              onChange={(e) => setMeaning(e.target.value)}
+              rows={3}
+              className="border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="manual-image" className="text-sm font-medium">
+              画像 (オプション)
+            </Label>
+            <Tabs value={imageInputType} onValueChange={(value) => setImageInputType(value as "file" | "url")} className="space-y-3">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="file" className="flex items-center gap-2">
+                  <FileImage className="h-4 w-4" />
+                  ファイル
+                </TabsTrigger>
+                <TabsTrigger value="url" className="flex items-center gap-2">
+                  <Link className="h-4 w-4" />
+                  URL
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="file" className="space-y-3">
+                <Input
+                  id="manual-image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
+                />
+              </TabsContent>
+
+              <TabsContent value="url" className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="例: https://example.com/image.jpg"
+                    value={imageUrlInput}
+                    onChange={(e) => setImageUrlInput(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleImageUrlSubmit()}
+                    className="flex-1 border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
+                  />
+                  <Button
+                    onClick={handleImageUrlSubmit}
+                    disabled={!imageUrlInput.trim()}
+                    variant="outline"
+                    className="border-purple-200 hover:border-purple-300 hover:bg-purple-50 dark:border-gray-600 dark:hover:bg-gray-700"
+                  >
+                    設定
+                  </Button>
+                </div>
+              </TabsContent>
+
+              {imageUrl && (
+                <div className="relative inline-block">
+                  <img
+                    src={imageUrl}
+                    alt="設定画像"
+                    className="w-32 h-32 object-cover rounded border border-purple-200 dark:border-gray-600"
+                    crossOrigin="anonymous"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </Tabs>
+          </div>
+
+          <Button
+            onClick={sendToAnki}
+            disabled={loading || !word.trim() || !meaning.trim()}
+            className="w-full h-11 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Ankiに送信中...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Ankiに送信
+              </>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
