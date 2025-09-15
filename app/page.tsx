@@ -73,6 +73,7 @@ export default function AnkiVocabularyApp() {
     try {
       // 文章かどうかの判定（スペースが含まれている、または複数の単語）
       const isPhrase = word.trim().includes(' ') || word.trim().split(/\s+/).length > 1;
+      console.log('Input:', word, 'isPhrase:', isPhrase, 'split length:', word.trim().split(/\s+/).length);
 
       if (isPhrase) {
         // 文章の場合は翻訳APIを使用
@@ -91,23 +92,27 @@ export default function AnkiVocabularyApp() {
         }
 
         setTranslatedText(data.translatedText);
+        setDefinition(null); // 辞書結果をクリア
+        console.log('Translation result:', data.translatedText);
         toast({
-          title: "翻訳完了",
-          description: `「${word}」を翻訳しました`,
+          title: "翻訳完了（文章モード）",
+          description: `「${word}」→「${data.translatedText}」`,
         });
       } else {
         // 単語の場合は辞書APIを使用
         const response = await fetch(
-          `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+          `/api/dictionary?word=${encodeURIComponent(word)}`
         );
         if (!response.ok) throw new Error("単語が見つかりませんでした");
 
         const data = await response.json();
-        setDefinition(data[0]);
+        setDefinition(data.definitions[0]);
+        setTranslatedText(""); // 翻訳結果をクリア
+        console.log('Dictionary result:', data.definitions[0]);
 
         toast({
-          title: "検索完了",
-          description: `「${word}」の意味を取得しました`,
+          title: "検索完了（単語モード）",
+          description: `「${word}」の辞書定義を取得しました`,
         });
       }
     } catch (error) {
