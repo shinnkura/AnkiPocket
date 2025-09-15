@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { text, deckName } = body;
 
-    // バリデーション
+    // Validation
     if (!text || !text.trim()) {
       return NextResponse.json(
         { error: "Text parameter is required", success: false },
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     try {
       if (isPhrase) {
-        // 文章の場合：翻訳処理
+        // For phrases: translation processing
         const translateResponse = await fetch(
           `${request.nextUrl.origin}/api/translate?text=${encodeURIComponent(trimmedText)}&from=en&to=ja`
         );
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // 画像生成（文章の最初の単語を使用）
+        // Image generation (using the first word of the phrase)
         const firstWord = trimmedText.split(/\s+/)[0];
         const imageResponse = await fetch(
           `${request.nextUrl.origin}/api/unsplash?query=${encodeURIComponent(firstWord)}`
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
           imageUrl = imageData.imageUrl;
         }
       } else {
-        // 単語の場合：辞書検索
+        // For words: dictionary lookup
         const dictResponse = await fetch(
           `${request.nextUrl.origin}/api/dictionary?word=${encodeURIComponent(trimmedText)}`
         );
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // 画像生成
+        // Image generation
         const imageResponse = await fetch(
           `${request.nextUrl.origin}/api/unsplash?query=${encodeURIComponent(trimmedText)}`
         );
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Anki送信処理
+      // Anki submission processing
       let ankiNoteId = null;
       try {
         ankiNoteId = await sendToAnki({
@@ -89,14 +89,14 @@ export async function POST(request: NextRequest) {
         console.error('AnkiConnect error:', ankiError);
         return NextResponse.json(
           {
-            error: `AnkiConnect接続エラー: ${ankiError instanceof Error ? ankiError.message : String(ankiError)}`,
+            error: `AnkiConnect connection error: ${ankiError instanceof Error ? ankiError.message : String(ankiError)}`,
             success: false
           },
           { status: 500 }
         );
       }
 
-      // 成功レスポンス
+      // Success response
       const response = {
         success: true,
         type: isPhrase ? 'phrase' : 'word',
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       console.error('Processing error:', error);
       return NextResponse.json(
         {
-          error: `処理エラー: ${error instanceof Error ? error.message : String(error)}`,
+          error: `Processing error: ${error instanceof Error ? error.message : String(error)}`,
           success: false
         },
         { status: 500 }
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Anki送信用のヘルパー関数
+// Helper function for Anki submission
 async function sendToAnki({
   text,
   definition,
@@ -152,7 +152,7 @@ async function sendToAnki({
 }) {
   let imageFileName = "";
 
-  // 画像処理
+  // Image processing
   if (imageUrl) {
     try {
       const imageResponse = await fetch(imageUrl);
@@ -186,16 +186,16 @@ async function sendToAnki({
 
       const storeMediaResult = await storeMediaResponse.json();
       if (storeMediaResult.error) {
-        console.log(`画像保存エラー: ${storeMediaResult.error}`);
+        console.log(`Image save error: ${storeMediaResult.error}`);
         imageFileName = "";
       }
     } catch (imageError) {
-      console.log(`画像処理エラー: ${imageError}`);
+      console.log(`Image processing error: ${imageError}`);
       imageFileName = "";
     }
   }
 
-  // モデル名取得
+  // Get model names
   const modelNamesResponse = await fetch("http://127.0.0.1:8765", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -206,7 +206,7 @@ async function sendToAnki({
   });
 
   if (!modelNamesResponse.ok) {
-    throw new Error("AnkiConnectに接続できません");
+    throw new Error("Cannot connect to AnkiConnect");
   }
 
   const modelNamesResult = await modelNamesResponse.json();
@@ -216,12 +216,12 @@ async function sendToAnki({
 
   const availableModels = modelNamesResult.result;
   if (!availableModels || availableModels.length === 0) {
-    throw new Error("利用可能なノートタイプが見つかりません");
+    throw new Error("No available note types found");
   }
 
   const modelName = availableModels[0];
 
-  // フィールド名取得
+  // Get field names
   const modelFieldsResponse = await fetch("http://127.0.0.1:8765", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -235,13 +235,13 @@ async function sendToAnki({
   const modelFieldsResult = await modelFieldsResponse.json();
   const fieldNames = modelFieldsResult.result || ["Front", "Back"];
 
-  // フィールド構築
+  // Build fields
   const fields: Record<string, string> = {};
 
   if (definition) {
-    // 単語の場合
-    if (fieldNames.includes("センテンス")) {
-      fields["センテンス"] = definition.phonetic
+    // For words
+    if (fieldNames.includes("Sentence")) {
+      fields["Sentence"] = definition.phonetic
         ? `${text} /${definition.phonetic}/`
         : text;
     } else {
@@ -250,27 +250,27 @@ async function sendToAnki({
         : text;
     }
 
-    if (fieldNames.includes("日本語の意味")) {
-      fields["日本語の意味"] = definition.meanings
+    if (fieldNames.includes("Japanese Meaning")) {
+      fields["Japanese Meaning"] = definition.meanings
         .map((meaning: any) =>
           `${meaning.partOfSpeech}: ${meaning.definitions[0].definition}`
         )
         .join("\n");
     }
 
-    if (fieldNames.includes("画像") && imageFileName) {
-      fields["画像"] = `<img src="${imageFileName}">`;
+    if (fieldNames.includes("Image") && imageFileName) {
+      fields["Image"] = `<img src="${imageFileName}">`;
     }
 
-    // フォールバック
-    if (!fieldNames.includes("センテンス") && !fieldNames.includes("日本語の意味")) {
+    // Fallback
+    if (!fieldNames.includes("Sentence") && !fieldNames.includes("Japanese Meaning")) {
       fields[fieldNames[1] || fieldNames[0]] = `
         <div style="font-family: Arial, sans-serif;">
           ${definition.meanings
             .map((meaning: any) => `
             <p><strong>${meaning.partOfSpeech}:</strong> ${meaning.definitions[0].definition}</p>
             ${meaning.definitions[0].example
-              ? `<p><em>例文: "${meaning.definitions[0].example}"</em></p>`
+              ? `<p><em>Example: "${meaning.definitions[0].example}"</em></p>`
               : ""
             }
           `)
@@ -280,17 +280,17 @@ async function sendToAnki({
       `;
     }
   } else if (translatedText) {
-    // 文章の場合
+    // For phrases
     fields[fieldNames[0]] = text;
     fields[fieldNames[1] || fieldNames[0]] = `
       <div style="font-family: Arial, sans-serif;">
-        <p><strong>翻訳:</strong> ${translatedText}</p>
+        <p><strong>Translation:</strong> ${translatedText}</p>
         ${imageFileName ? `<br><img src="${imageFileName}">` : ""}
       </div>
     `;
   }
 
-  // ノート追加
+  // Add note
   const ankiNote = {
     action: "addNote",
     version: 6,

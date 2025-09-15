@@ -9,7 +9,7 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   title: "AnkiPocket",
-  description: "英単語を簡単にAnkiに登録できるアプリ",
+  description: "An app to easily register English words to Anki",
   generator: "v0.app",
 }
 
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={null}>
           {children}

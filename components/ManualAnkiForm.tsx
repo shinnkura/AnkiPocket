@@ -50,8 +50,8 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
       setImageUrl(imageUrlInput.trim());
       setImageFile(null);
       toast({
-        title: "画像URL設定",
-        description: "画像URLが設定されました。",
+        title: "Image URL Set",
+        description: "Image URL has been set.",
       });
     }
   };
@@ -65,8 +65,8 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
   const sendToAnki = async () => {
     if (!word.trim() || !meaning.trim()) {
       toast({
-        title: "入力エラー",
-        description: "単語と意味の両方を入力してください。",
+        title: "Input Error",
+        description: "Please enter both word and meaning.",
         variant: "destructive",
       });
       return;
@@ -84,7 +84,7 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
           meaning: meaning.trim(),
           imageUrl: imageUrl,
           imageFile: imageFile ? {
-            data: imageUrl.split(",")[1], // base64データ部分のみ
+            data: imageUrl.split(",")[1], // base64 data part only
             filename: `${word}_${Date.now()}.${imageFile.type.split("/")[1]}`,
           } : null,
           imageUrlInput: !imageFile && imageUrl ? imageUrl : null,
@@ -95,31 +95,31 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Ankiへの送信に失敗しました");
+        throw new Error(result.error || "Failed to send to Anki");
       }
 
       if (result.success) {
         toast({
-          title: "成功！",
-          description: `単語「${word}」をAnkiに追加しました！${
-            imageFile ? "（画像付き）" : ""
+          title: "Success!",
+          description: `Added word "${word}" to Anki!${
+            imageFile ? " (with image)" : ""
           }`,
         });
 
-        // フォームをリセット
+        // Reset form
         setWord("");
         setMeaning("");
         setImageUrl("");
         setImageFile(null);
         setImageUrlInput("");
       } else {
-        throw new Error(result.error || "Ankiへの送信に失敗しました");
+        throw new Error(result.error || "Failed to send to Anki");
       }
     } catch (error) {
       console.error("Manual Anki send error:", error);
       toast({
-        title: "送信エラー",
-        description: `エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+        title: "Send Error",
+        description: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
@@ -131,21 +131,21 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
     <Card className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-gray-700">
       <CardHeader className="text-center">
         <CardTitle className="text-xl text-purple-600 dark:text-purple-400">
-          手動でAnkiカードを作成
+          Create Anki Card Manually
         </CardTitle>
         <CardDescription className="text-gray-600 dark:text-gray-400">
-          単語、意味、画像を自分で入力してAnkiに送信します
+          Enter word, meaning, and image manually to send to Anki
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="manual-word" className="text-sm font-medium">
-              単語 <span className="text-red-500">*</span>
+              Word <span className="text-red-500">*</span>
             </Label>
             <Input
               id="manual-word"
-              placeholder="例: beautiful"
+              placeholder="e.g. beautiful"
               value={word}
               onChange={(e) => setWord(e.target.value)}
               className="border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
@@ -154,11 +154,11 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="manual-meaning" className="text-sm font-medium">
-              意味 <span className="text-red-500">*</span>
+              Meaning <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="manual-meaning"
-              placeholder="例: 美しい、きれいな"
+              placeholder="e.g. beautiful, pretty"
               value={meaning}
               onChange={(e) => setMeaning(e.target.value)}
               rows={3}
@@ -168,13 +168,13 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="manual-image" className="text-sm font-medium">
-              画像 (オプション)
+              Image (Optional)
             </Label>
             <Tabs value={imageInputType} onValueChange={(value) => setImageInputType(value as "file" | "url")} className="space-y-3">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="file" className="flex items-center gap-2">
                   <FileImage className="h-4 w-4" />
-                  ファイル
+                  File
                 </TabsTrigger>
                 <TabsTrigger value="url" className="flex items-center gap-2">
                   <Link className="h-4 w-4" />
@@ -195,7 +195,7 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
               <TabsContent value="url" className="space-y-3">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="例: https://example.com/image.jpg"
+                    placeholder="e.g. https://example.com/image.jpg"
                     value={imageUrlInput}
                     onChange={(e) => setImageUrlInput(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleImageUrlSubmit()}
@@ -207,7 +207,7 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
                     variant="outline"
                     className="border-purple-200 hover:border-purple-300 hover:bg-purple-50 dark:border-gray-600 dark:hover:bg-gray-700"
                   >
-                    設定
+                    Set
                   </Button>
                 </div>
               </TabsContent>
@@ -216,7 +216,7 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
                 <div className="relative inline-block">
                   <img
                     src={imageUrl}
-                    alt="設定画像"
+                    alt="Selected image"
                     className="w-32 h-32 object-cover rounded border border-purple-200 dark:border-gray-600"
                     crossOrigin="anonymous"
                   />
@@ -241,12 +241,12 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Ankiに送信中...
+                Sending to Anki...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Ankiに送信
+                Send to Anki
               </>
             )}
           </Button>

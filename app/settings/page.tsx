@@ -23,10 +23,10 @@ export default function SettingsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // ページタイトルを設定
-    document.title = "AnkiPocket - 設定";
+    // Set page title
+    document.title = "AnkiPocket - Settings";
 
-    // localStorageから設定を読み込み
+    // Load settings from localStorage
     if (typeof window !== "undefined") {
       const savedSettings = localStorage.getItem("ankiPocketSettings");
       if (savedSettings) {
@@ -34,7 +34,7 @@ export default function SettingsPage() {
           const parsed = JSON.parse(savedSettings);
           setSettings({ ...DEFAULT_SETTINGS, ...parsed });
         } catch (error) {
-          console.error("設定の読み込みエラー:", error);
+          console.error("Settings loading error:", error);
         }
       }
     }
@@ -45,13 +45,13 @@ export default function SettingsPage() {
     try {
       localStorage.setItem("ankiPocketSettings", JSON.stringify(settings));
       toast({
-        title: "設定を保存しました",
-        description: "設定が正常に保存されました。",
+        title: "Settings saved",
+        description: "Settings have been saved successfully.",
       });
     } catch (error) {
       toast({
-        title: "保存エラー",
-        description: "設定の保存に失敗しました。",
+        title: "Save error",
+        description: "Failed to save settings.",
         variant: "destructive",
       });
     } finally {
@@ -68,7 +68,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
-      {/* ヘッダー */}
+      {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
@@ -83,10 +83,10 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  設定
+                  Settings
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  AnkiPocketの設定を変更
+                  Modify AnkiPocket settings
                 </p>
               </div>
             </div>
@@ -94,42 +94,42 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* メインコンテンツ */}
+      {/* Main content */}
       <div className="max-w-4xl mx-auto p-6 space-y-6">
 
-        {/* Anki設定 */}
+        {/* Anki settings */}
         <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="text-xl text-blue-600 dark:text-blue-400 flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">A</span>
               </div>
-              Anki設定
+              Anki Settings
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <Label htmlFor="deckName" className="text-base font-medium text-gray-700 dark:text-gray-300">
-                デッキ名
+                Deck Name
               </Label>
               <Input
                 id="deckName"
-                placeholder="例: English Vocabulary"
+                placeholder="e.g. English Vocabulary"
                 value={settings.deckName}
                 onChange={(e) => handleDeckNameChange(e.target.value)}
                 className="h-11 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
               />
               <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded border border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  <strong>ヒント:</strong> 単語カードを追加するAnkiデッキの名前を設定してください。
-                  デッキが存在しない場合は保存されません。
+                  <strong>Tip:</strong> Set the name of the Anki deck where word cards will be added.
+                  Cards will not be saved if the deck doesn't exist.
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 保存ボタン */}
+        {/* Save button */}
         <div className="flex justify-center">
           <Button
             onClick={saveSettings}
@@ -139,22 +139,22 @@ export default function SettingsPage() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                保存中...
+                Saving...
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                設定を保存
+                Save Settings
               </>
             )}
           </Button>
         </div>
 
-        {/* 使用方法 */}
+        {/* Usage instructions */}
         <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="text-lg text-blue-600 dark:text-blue-400">
-              使用方法
+              How to Use
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -164,7 +164,7 @@ export default function SettingsPage() {
                   1
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  上記でデッキ名を設定し、「設定を保存」ボタンを押してください。
+                  Set the deck name above and click the "Save Settings" button.
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-800">
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                   2
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  メインページに戻り、英単語を入力して単語カードを作成してください。
+                  Return to the main page and enter English words to create word cards.
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-100 dark:border-blue-800">
@@ -180,7 +180,7 @@ export default function SettingsPage() {
                   3
                 </div>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  単語カードは指定したデッキに自動的に追加されます。
+                  Word cards will be automatically added to the specified deck.
                 </p>
               </div>
             </div>

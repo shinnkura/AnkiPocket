@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
 
     if (!word || !meaning) {
       return NextResponse.json(
-        { error: "単語と意味は必須です" },
+        { error: "Word and meaning are required" },
         { status: 400 }
       );
     }
@@ -15,10 +15,10 @@ export async function POST(request: NextRequest) {
     let imageFileName = "";
     let imageHtml = "";
 
-    // ファイルアップロードされた画像の処理
+    // Process uploaded image files
     if (imageFile && imageFile.data) {
       try {
-        // AnkiConnectのstoreMediaFileアクションで画像を保存
+        // Save image using AnkiConnect's storeMediaFile action
         const storeMediaResponse = await fetch("http://127.0.0.1:8765", {
           method: "POST",
           headers: {
@@ -36,23 +36,23 @@ export async function POST(request: NextRequest) {
 
         const storeMediaResult = await storeMediaResponse.json();
         if (storeMediaResult.error) {
-          console.log(`画像保存エラー: ${storeMediaResult.error}`);
+          console.log(`Image save error: ${storeMediaResult.error}`);
         } else {
           imageFileName = imageFile.filename;
           imageHtml = `<img src="${imageFileName}">`;
-          console.log(`画像保存成功: ${imageFileName}`);
+          console.log(`Image save success: ${imageFileName}`);
         }
       } catch (imageError) {
-        console.log(`画像処理エラー: ${imageError}`);
+        console.log(`Image processing error: ${imageError}`);
       }
     }
-    // URL画像の処理
+    // Process URL images
     else if (imageUrlInput) {
       imageHtml = `<img src="${imageUrlInput}">`;
-      console.log(`画像URL設定: ${imageUrlInput}`);
+      console.log(`Image URL set: ${imageUrlInput}`);
     }
 
-    // AnkiConnectでモデル名を取得
+    // Get model names using AnkiConnect
     const modelNamesResponse = await fetch("http://127.0.0.1:8765", {
       method: "POST",
       headers: {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!modelNamesResponse.ok) {
-      throw new Error("AnkiConnectに接続できません");
+      throw new Error("Cannot connect to AnkiConnect");
     }
 
     const modelNamesResult = await modelNamesResponse.json();
@@ -76,12 +76,12 @@ export async function POST(request: NextRequest) {
 
     const availableModels = modelNamesResult.result;
     if (!availableModels || availableModels.length === 0) {
-      throw new Error("利用可能なノートタイプが見つかりません");
+      throw new Error("No available note types found");
     }
 
     const modelName = availableModels[0];
 
-    // モデルのフィールド名を取得
+    // Get model field names
     const modelFieldsResponse = await fetch("http://127.0.0.1:8765", {
       method: "POST",
       headers: {
@@ -99,44 +99,44 @@ export async function POST(request: NextRequest) {
     const modelFieldsResult = await modelFieldsResponse.json();
     const fieldNames = modelFieldsResult.result || ["Front", "Back"];
 
-    // フィールドの設定
+    // Field configuration
     const fields: Record<string, string> = {};
 
-    // 単語フィールド
-    if (fieldNames.includes("センテンス")) {
-      fields["センテンス"] = word;
+    // Word field
+    if (fieldNames.includes("Sentence")) {
+      fields["Sentence"] = word;
     } else {
       fields[fieldNames[0]] = word;
     }
 
-    // 意味フィールド
-    if (fieldNames.includes("日本語の意味")) {
-      fields["日本語の意味"] = meaning;
+    // Meaning field
+    if (fieldNames.includes("Japanese Meaning")) {
+      fields["Japanese Meaning"] = meaning;
     } else if (fieldNames.length > 1) {
       fields[fieldNames[1]] = meaning;
     } else {
-      // フィールドが1つしかない場合は、単語と意味を組み合わせる
+      // If there's only one field, combine word and meaning
       fields[fieldNames[0]] = `${word}\n\n${meaning}`;
     }
 
-    // 画像フィールド
-    if (fieldNames.includes("画像") && imageHtml) {
-      fields["画像"] = imageHtml;
+    // Image field
+    if (fieldNames.includes("Image") && imageHtml) {
+      fields["Image"] = imageHtml;
     } else if (imageHtml && fieldNames.length > 2) {
-      // 画像専用フィールドがない場合、3番目のフィールドに設定
+      // If there's no dedicated image field, use the third field
       fields[fieldNames[2]] = imageHtml;
     } else if (imageHtml && fieldNames.length === 2) {
-      // フィールドが2つしかない場合、意味フィールドに画像を追加
-      const meaningField = fieldNames.includes("日本語の意味") ? "日本語の意味" : fieldNames[1];
+      // If there are only two fields, add image to the meaning field
+      const meaningField = fieldNames.includes("Japanese Meaning") ? "Japanese Meaning" : fieldNames[1];
       fields[meaningField] += `<br><br>${imageHtml}`;
     }
 
-    // 語源フィールドがある場合は空にしておく
-    if (fieldNames.includes("語源")) {
-      fields["語源"] = "";
+    // Leave etymology field empty if it exists
+    if (fieldNames.includes("Etymology")) {
+      fields["Etymology"] = "";
     }
 
-    // Ankiにノートを追加
+    // Add note to Anki
     const ankiNote = {
       action: "addNote",
       version: 6,
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Manual Anki API error:", error);
 
-    let errorMessage = "不明なエラーが発生しました";
+    let errorMessage = "An unknown error occurred";
 
     if (error instanceof Error) {
       errorMessage = error.message;

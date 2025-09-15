@@ -47,7 +47,6 @@ export default function AnkiVocabularyApp() {
   const [imageQuery, setImageQuery] = useState("");
   const [showImageQueryInput, setShowImageQueryInput] = useState(false);
   const [translatedText, setTranslatedText] = useState("");
-  const [translateLoading, setTranslateLoading] = useState(false);
   const [autoProcessing, setAutoProcessing] = useState(false);
   const { toast } = useToast();
 
@@ -55,14 +54,14 @@ export default function AnkiVocabularyApp() {
     if (typeof window !== "undefined") {
       setCurrentDomain(window.location.origin);
 
-      // localStorageから設定を読み込み
+      // Load settings from localStorage
       const savedSettings = localStorage.getItem("ankiPocketSettings");
       if (savedSettings) {
         try {
           const parsed = JSON.parse(savedSettings);
           setSettings({ ...DEFAULT_SETTINGS, ...parsed });
         } catch (error) {
-          console.error("設定の読み込みエラー:", error);
+          console.error("Settings loading error:", error);
         }
       }
     }
@@ -73,12 +72,12 @@ export default function AnkiVocabularyApp() {
 
     setLoading(true);
     try {
-      // 文章かどうかの判定（スペースが含まれている、または複数の単語）
+      // Determine if it's a phrase (contains spaces or multiple words)
       const isPhrase = word.trim().includes(' ') || word.trim().split(/\s+/).length > 1;
       console.log('Input:', word, 'isPhrase:', isPhrase, 'split length:', word.trim().split(/\s+/).length);
 
       if (isPhrase) {
-        // 文章の場合は翻訳APIを使用
+        // For phrases, use translation API
         console.log('Calling translation API for phrase:', word);
         const response = await fetch(
           `/api/translate?text=${encodeURIComponent(word)}&from=en&to=ja`
@@ -87,7 +86,7 @@ export default function AnkiVocabularyApp() {
         console.log('Translation API response status:', response.status);
         if (!response.ok) {
           console.error('Translation API failed:', response.status, response.statusText);
-          throw new Error(`翻訳に失敗しました (${response.status})`);
+          throw new Error(`Translation failed (${response.status})`);
         }
 
         const data = await response.json();
@@ -95,18 +94,18 @@ export default function AnkiVocabularyApp() {
 
         if (!data.success) {
           console.error('Translation API returned error:', data.error);
-          throw new Error(data.error || "翻訳に失敗しました");
+          throw new Error(data.error || "Translation failed");
         }
 
         setTranslatedText(data.translatedText);
-        setDefinition(null); // 辞書結果をクリア
+        setDefinition(null); // Clear dictionary results
         console.log('Translation result:', data.translatedText);
         toast({
-          title: "翻訳完了（文章モード）",
-          description: `「${word}」→「${data.translatedText}」`,
+          title: "Translation complete (Phrase mode)",
+          description: `"${word}" → "${data.translatedText}"`,
         });
       } else {
-        // 単語の場合は辞書APIを使用
+        // For words, use dictionary API
         console.log('Calling dictionary API for word:', word);
         const response = await fetch(
           `/api/dictionary?word=${encodeURIComponent(word)}`
@@ -115,25 +114,25 @@ export default function AnkiVocabularyApp() {
         console.log('Dictionary API response status:', response.status);
         if (!response.ok) {
           console.error('Dictionary API failed:', response.status, response.statusText);
-          throw new Error(`単語が見つかりませんでした (${response.status})`);
+          throw new Error(`Word not found (${response.status})`);
         }
 
         const data = await response.json();
         console.log('Dictionary API response data:', data);
         setDefinition(data.definitions[0]);
-        setTranslatedText(""); // 翻訳結果をクリア
+        setTranslatedText(""); // Clear translation results
         console.log('Dictionary result:', data.definitions[0]);
 
         toast({
-          title: "検索完了（単語モード）",
-          description: `「${word}」の辞書定義を取得しました`,
+          title: "Search complete (Word mode)",
+          description: `Retrieved dictionary definition for "${word}"`,
         });
       }
     } catch (error) {
       console.error('fetchDefinition error:', error);
       toast({
-        title: "エラー",
-        description: `検索に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+        title: "Error",
+        description: `Search failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
@@ -141,43 +140,9 @@ export default function AnkiVocabularyApp() {
     }
   };
 
-  const translateText = async () => {
-    if (!word.trim()) return;
-
-    setTranslateLoading(true);
-    try {
-      const response = await fetch(
-        `/api/translate?text=${encodeURIComponent(word)}&from=en&to=ja`
-      );
-
-      if (!response.ok) {
-        throw new Error("翻訳に失敗しました");
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || "翻訳に失敗しました");
-      }
-
-      setTranslatedText(data.translatedText);
-      toast({
-        title: "翻訳完了",
-        description: `「${word}」を翻訳しました`,
-      });
-    } catch (error) {
-      toast({
-        title: "翻訳エラー",
-        description: "文章の翻訳に失敗しました。",
-        variant: "destructive",
-      });
-    } finally {
-      setTranslateLoading(false);
-    }
-  };
 
   const generateImage = async (customQuery?: string) => {
-    // デバッグ用ログ - 個別の値をチェック
+    // Debug log - check individual values
     console.log('generateImage called - individual values:', {
       customQuery: { value: customQuery, type: typeof customQuery },
       imageQuery: { value: imageQuery, type: typeof imageQuery },
@@ -203,8 +168,8 @@ export default function AnkiVocabularyApp() {
       });
 
       toast({
-        title: "画像生成エラー",
-        description: "検索キーワードが無効です。単語を入力してから画像生成を試してください。",
+        title: "Image generation error",
+        description: "Invalid search keyword. Please enter a word before generating an image.",
         variant: "destructive",
       });
       return;
@@ -212,7 +177,7 @@ export default function AnkiVocabularyApp() {
 
     setImageLoading(true);
     try {
-      // API Routeを使用してUnsplash画像を取得
+      // Use API Route to get Unsplash images
       const response = await fetch(
         `/api/unsplash?query=${encodeURIComponent(queryToUse)}`
       );
@@ -221,36 +186,36 @@ export default function AnkiVocabularyApp() {
         const data = await response.json();
         setImageUrl(data.imageUrl);
 
-        // 最初の生成時にimageQueryを初期化
+        // Initialize imageQuery on first generation
         if (!imageQuery) {
           setImageQuery(queryToUse);
         }
 
         if (data.source === "unsplash") {
           toast({
-            title: "画像取得成功",
-            description: `「${queryToUse}」の画像を取得しました！`,
+            title: "Image retrieved successfully",
+            description: `Retrieved image for "${queryToUse}"!`,
           });
         } else {
           toast({
-            title: "画像生成",
-            description: "ランダム画像を表示しています。",
+            title: "Image generated",
+            description: "Displaying random image.",
           });
         }
         return;
       }
 
-      // フォールバック: ランダム画像
+      // Fallback: random image
       setImageUrl(`https://picsum.photos/300/200?random=${Date.now()}`);
       toast({
-        title: "画像生成",
-        description: "ランダム画像を表示しています。",
+        title: "Image generated",
+        description: "Displaying random image.",
       });
     } catch (error) {
       setImageUrl(`https://picsum.photos/300/200?random=${Date.now()}`);
       toast({
-        title: "画像生成エラー",
-        description: "ランダム画像を表示しています。",
+        title: "Image generation error",
+        description: "Displaying random image.",
         variant: "destructive",
       });
     } finally {
@@ -265,8 +230,8 @@ export default function AnkiVocabularyApp() {
   const handleImageRegenerateSubmit = async () => {
     if (!imageQuery.trim()) {
       toast({
-        title: "入力エラー",
-        description: "検索キーワードを入力してください。",
+        title: "Input error",
+        description: "Please enter a search keyword.",
         variant: "destructive",
       });
       return;
@@ -278,7 +243,7 @@ export default function AnkiVocabularyApp() {
 
   const handleImageRegenerateCancel = () => {
     setShowImageQueryInput(false);
-    // 元の検索クエリに戻す
+    // Return to original search query
     setImageQuery(word);
   };
 
@@ -301,11 +266,11 @@ export default function AnkiVocabularyApp() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "自動処理に失敗しました");
+        throw new Error(result.error || "Auto processing failed");
       }
 
       if (result.success) {
-        // 結果を画面に反映
+        // Apply results to screen
         if (result.type === "word") {
           setDefinition(result.definition);
           setTranslatedText("");
@@ -320,23 +285,23 @@ export default function AnkiVocabularyApp() {
         }
 
         toast({
-          title: "自動処理完了！",
-          description: `「${word}」を自動で処理してAnkiに送信しました！`,
+          title: "Auto processing complete!",
+          description: `Automatically processed "${word}" and sent to Anki!`,
         });
 
-        // リセット
+        // Reset
         setWord("");
         setDefinition(null);
         setImageUrl("");
         setTranslatedText("");
       } else {
-        throw new Error(result.error || "自動処理に失敗しました");
+        throw new Error(result.error || "Auto processing failed");
       }
     } catch (error) {
       console.error("Auto process error:", error);
       toast({
-        title: "自動処理エラー",
-        description: `エラーが発生しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+        title: "Auto processing error",
+        description: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     } finally {
@@ -351,22 +316,22 @@ export default function AnkiVocabularyApp() {
       let imageFileName = "";
       if (imageUrl) {
         try {
-          // 画像をfetchしてblobに変換
+          // Fetch image and convert to blob
           const imageResponse = await fetch(imageUrl);
           const imageBlob = await imageResponse.blob();
 
-          // blobをbase64に変換
+          // Convert blob to base64
           const base64Data = await new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.onloadend = () => {
               const base64 = reader.result as string;
-              // data:image/jpeg;base64, の部分を除去
+              // Remove data:image/jpeg;base64, part
               resolve(base64.split(",")[1]);
             };
             reader.readAsDataURL(imageBlob);
           });
 
-          // ファイル名を生成（単語名 + タイムスタンプ）
+          // Generate filename (word + timestamp)
           const timestamp = Date.now();
           const extension =
             imageUrl.includes(".jpg") || imageUrl.includes(".jpeg")
@@ -374,7 +339,7 @@ export default function AnkiVocabularyApp() {
               : "png";
           imageFileName = `${word}_${timestamp}.${extension}`;
 
-          // AnkiConnectのstoreMediaFileアクションで画像を保存
+          // Save image using AnkiConnect's storeMediaFile action
           const storeMediaResponse = await fetch("http://127.0.0.1:8765", {
             method: "POST",
             headers: {
@@ -392,14 +357,14 @@ export default function AnkiVocabularyApp() {
 
           const storeMediaResult = await storeMediaResponse.json();
           if (storeMediaResult.error) {
-            console.log(`画像保存エラー: ${storeMediaResult.error}`);
-            imageFileName = ""; // エラーの場合は画像なしで続行
+            console.log(`Image save error: ${storeMediaResult.error}`);
+            imageFileName = ""; // Continue without image if error
           } else {
-            console.log(`画像保存成功: ${imageFileName}`);
+            console.log(`Image save successful: ${imageFileName}`);
           }
         } catch (imageError) {
-          console.log(`画像処理エラー: ${imageError}`);
-          imageFileName = ""; // エラーの場合は画像なしで続行
+          console.log(`Image processing error: ${imageError}`);
+          imageFileName = ""; // Continue without image if error
         }
       }
 
@@ -415,7 +380,7 @@ export default function AnkiVocabularyApp() {
       });
 
       if (!modelNamesResponse.ok) {
-        throw new Error("AnkiConnectに接続できません");
+        throw new Error("Cannot connect to AnkiConnect");
       }
 
       const modelNamesResult = await modelNamesResponse.json();
@@ -425,14 +390,14 @@ export default function AnkiVocabularyApp() {
       }
 
       const availableModels = modelNamesResult.result;
-      console.log(`利用可能なノートタイプ:`, availableModels);
+      console.log(`Available note types:`, availableModels);
 
       if (!availableModels || availableModels.length === 0) {
-        throw new Error("利用可能なノートタイプが見つかりません");
+        throw new Error("No available note types found");
       }
 
       const modelName = availableModels[0];
-      console.log(`使用するノートタイプ: ${modelName}`);
+      console.log(`Using note type: ${modelName}`);
 
       const modelFieldsResponse = await fetch("http://127.0.0.1:8765", {
         method: "POST",
@@ -450,63 +415,138 @@ export default function AnkiVocabularyApp() {
 
       const modelFieldsResult = await modelFieldsResponse.json();
       const fieldNames = modelFieldsResult.result || ["Front", "Back"];
-      console.log(`利用可能なフィールド:`, fieldNames);
+      console.log(`Available fields:`, fieldNames);
 
       const fields: Record<string, string> = {};
 
-      if (fieldNames.includes("センテンス")) {
-        fields["センテンス"] = definition.phonetic
-          ? `${word} /${definition.phonetic}/`
-          : word;
+      if (fieldNames.includes("Sentence") || fieldNames.includes("センテンス")) {
+        const fieldKey = fieldNames.includes("Sentence") ? "Sentence" : "センテンス";
+        fields[fieldKey] = `
+          <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+            <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 10px;">
+              ${word}
+            </div>
+            ${definition.phonetic ? `
+              <div style="font-size: 18px; color: #6b7280; font-family: monospace; margin-bottom: 15px;">
+                /${definition.phonetic}/
+              </div>
+            ` : ''}
+          </div>
+        `;
       } else {
-        fields[fieldNames[0]] = definition.phonetic
-          ? `${word} /${definition.phonetic}/`
-          : word;
+        fields[fieldNames[0]] = `
+          <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+            <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 10px;">
+              ${word}
+            </div>
+            ${definition.phonetic ? `
+              <div style="font-size: 18px; color: #6b7280; font-family: monospace; margin-bottom: 15px;">
+                /${definition.phonetic}/
+              </div>
+            ` : ''}
+          </div>
+        `;
       }
 
-      if (fieldNames.includes("日本語の意味")) {
-        fields["日本語の意味"] = definition.meanings
-          .map(
-            (meaning) =>
-              `${meaning.partOfSpeech}: ${meaning.definitions[0].definition}`
-          )
-          .join("\n");
+      if (fieldNames.includes("Meaning") || fieldNames.includes("日本語の意味")) {
+        const fieldKey = fieldNames.includes("Meaning") ? "Meaning" : "日本語の意味";
+        fields[fieldKey] = `
+          <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6;">
+            ${definition.meanings
+              .filter((meaning) => {
+                const commonParts = ['noun', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'];
+                const isCommonVerb = meaning.partOfSpeech === 'verb' &&
+                  meaning.definitions.some(def =>
+                    def.definition.length > 30 &&
+                    !def.definition.toLowerCase().includes('to become') &&
+                    !def.definition.toLowerCase().includes('to form')
+                  );
+                return commonParts.includes(meaning.partOfSpeech) || isCommonVerb;
+              })
+              .map((meaning) => `
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 6px;">
+                  <div style="font-weight: bold; color: #3b82f6; font-size: 16px; margin-bottom: 8px;">
+                    ${meaning.partOfSpeech}
+                  </div>
+                  <div style="font-size: 18px; color: #1f2937; margin-bottom: 10px;">
+                    ${meaning.definitions[0].definition}
+                  </div>
+                  ${meaning.definitions[0].example ? `
+                    <div style="font-style: italic; color: #6b7280; font-size: 16px; padding: 10px; background-color: #e0f2fe; border-radius: 4px; border-left: 3px solid #0ea5e9;">
+                      <strong>Example:</strong> "${meaning.definitions[0].example}"
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+          </div>
+        `;
       }
 
-      if (fieldNames.includes("画像") && imageFileName) {
-        fields["画像"] = `<img src="${imageFileName}">`;
+      if ((fieldNames.includes("Image") || fieldNames.includes("画像")) && imageFileName) {
+        const fieldKey = fieldNames.includes("Image") ? "Image" : "画像";
+        fields[fieldKey] = `
+          <div style="text-align: center; padding: 20px;">
+            <img src="${imageFileName}" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+          </div>
+        `;
       }
 
-      if (fieldNames.includes("語源")) {
-        fields["語源"] = "";
+      if (fieldNames.includes("Etymology") || fieldNames.includes("語源")) {
+        const fieldKey = fieldNames.includes("Etymology") ? "Etymology" : "語源";
+        fields[fieldKey] = "";
       }
 
-      // フォールバック: 基本的なフィールド構成
+      // Fallback: basic field configuration
       if (
-        !fieldNames.includes("センテンス") &&
-        !fieldNames.includes("日本語の意味")
+        !fieldNames.includes("Sentence") && !fieldNames.includes("センテンス") &&
+        !fieldNames.includes("Meaning") && !fieldNames.includes("日本語の意味")
       ) {
-        fields[fieldNames[0]] = definition.phonetic
-          ? `${word} /${definition.phonetic}/`
-          : word;
+        fields[fieldNames[0]] = `
+          <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px;">
+            <div style="font-size: 28px; font-weight: bold; color: #2563eb; margin-bottom: 10px;">
+              ${word}
+            </div>
+            ${definition.phonetic ? `
+              <div style="font-size: 18px; color: #6b7280; font-family: monospace; margin-bottom: 15px;">
+                /${definition.phonetic}/
+              </div>
+            ` : ''}
+          </div>
+        `;
 
         fields[fieldNames[1] || fieldNames[0]] = `
-          <div style="font-family: Arial, sans-serif;">
+          <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.6;">
             ${definition.meanings
-              .map(
-                (meaning) => `
-              <p><strong>${meaning.partOfSpeech}:</strong> ${
-                  meaning.definitions[0].definition
-                }</p>
-              ${
-                meaning.definitions[0].example
-                  ? `<p><em>例文: "${meaning.definitions[0].example}"</em></p>`
-                  : ""
-              }
-            `
-              )
-              .join("")}
-            ${imageFileName ? `<br><img src="${imageFileName}">` : ""}
+              .filter((meaning) => {
+                const commonParts = ['noun', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'];
+                const isCommonVerb = meaning.partOfSpeech === 'verb' &&
+                  meaning.definitions.some(def =>
+                    def.definition.length > 30 &&
+                    !def.definition.toLowerCase().includes('to become') &&
+                    !def.definition.toLowerCase().includes('to form')
+                  );
+                return commonParts.includes(meaning.partOfSpeech) || isCommonVerb;
+              })
+              .map((meaning) => `
+                <div style="margin-bottom: 20px; padding: 15px; background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 6px;">
+                  <div style="font-weight: bold; color: #3b82f6; font-size: 16px; margin-bottom: 8px;">
+                    ${meaning.partOfSpeech}
+                  </div>
+                  <div style="font-size: 18px; color: #1f2937; margin-bottom: 10px;">
+                    ${meaning.definitions[0].definition}
+                  </div>
+                  ${meaning.definitions[0].example ? `
+                    <div style="font-style: italic; color: #6b7280; font-size: 16px; padding: 10px; background-color: #e0f2fe; border-radius: 4px; border-left: 3px solid #0ea5e9;">
+                      <strong>Example:</strong> "${meaning.definitions[0].example}"
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            ${imageFileName ? `
+              <div style="text-align: center; padding: 20px; margin-top: 20px;">
+                <img src="${imageFileName}" style="max-width: 400px; max-height: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+              </div>
+            ` : ""}
           </div>
         `;
       }
@@ -543,27 +583,27 @@ export default function AnkiVocabularyApp() {
       }
 
       toast({
-        title: "成功！",
-        description: `単語「${word}」をAnkiに追加しました！${
-          imageFileName ? "（画像付き）" : ""
+        title: "Success!",
+        description: `Added word "${word}" to Anki!${
+          imageFileName ? " (with image)" : ""
         }`,
       });
 
-      // リセット
+      // Reset
       setWord("");
       setDefinition(null);
       setImageUrl("");
       setTranslatedText("");
     } catch (error) {
-      console.error("Anki送信エラーの詳細:", error);
+      console.error("Anki sending error details:", error);
 
-      let errorTitle = "Anki送信エラー";
+      let errorTitle = "Anki sending error";
       let errorDescription = "";
 
       if (error instanceof Error) {
         const errorMessage = error.message.toLowerCase();
 
-        // HTTPエラーの場合
+        // For HTTP errors
         if (errorMessage.includes("http")) {
           const statusMatch = error.message.match(/HTTP (\d+):/);
           const status = statusMatch ? parseInt(statusMatch[1]) : null;
@@ -571,107 +611,107 @@ export default function AnkiVocabularyApp() {
           switch (status) {
             case 0:
             case null:
-              errorTitle = "接続エラー";
-              errorDescription = `AnkiConnectに接続できません。
+              errorTitle = "Connection error";
+              errorDescription = `Cannot connect to AnkiConnect.
 
-【確認事項】
-• Ankiアプリが起動していることを確認してください
-• AnkiConnectアドオン (2055492159) がインストールされていることを確認してください
-• Ankiの「ツール」→「アドオン」でAnkiConnectが有効になっていることを確認してください
+【Checklist】
+• Please ensure the Anki app is running
+• Please ensure AnkiConnect addon (2055492159) is installed
+• Please ensure AnkiConnect is enabled in Anki's "Tools" → "Add-ons"
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
               break;
             case 404:
-              errorTitle = "AnkiConnect未検出";
-              errorDescription = `AnkiConnectが見つかりません。
+              errorTitle = "AnkiConnect not detected";
+              errorDescription = `AnkiConnect not found.
 
-【確認事項】
-• AnkiConnectアドオン (2055492159) をインストールしてください
-• Ankiを再起動してください
+【Checklist】
+• Please install AnkiConnect addon (2055492159)
+• Please restart Anki
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
               break;
             case 403:
-              errorTitle = "CORS設定エラー";
-              errorDescription = `CORS設定が正しくありません。
+              errorTitle = "CORS configuration error";
+              errorDescription = `CORS configuration is incorrect.
 
-【設定手順】
-1. Ankiの「ツール」→「アドオン」を開く
-2. AnkiConnectを選択し「設定」をクリック
-3. "webCorsOriginList" に "${currentDomain}" を追加
-4. Ankiを再起動
+【Setup Steps】
+1. Open Anki's "Tools" → "Add-ons"
+2. Select AnkiConnect and click "Config"
+3. Add "${currentDomain}" to "webCorsOriginList"
+4. Restart Anki
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
               break;
             case 500:
-              errorTitle = "Anki内部エラー";
-              errorDescription = `Anki側でエラーが発生しました。
+              errorTitle = "Anki internal error";
+              errorDescription = `An error occurred on Anki's side.
 
-【確認事項】
-• 指定されたデッキ名「${settings.deckName}」が有効か確認してください
-• Ankiのノートタイプが正しく設定されているか確認してください
+【Checklist】
+• Please check if the deck name "${settings.deckName}" is valid
+• Please check if Anki's note type is correctly configured
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
               break;
             default:
-              errorDescription = `HTTP ${status} エラーが発生しました。
+              errorDescription = `HTTP ${status} error occurred.
 
-【エラー詳細】${error.message}
+【Error Details】${error.message}
 
-【確認事項】
-• Ankiアプリが起動していることを確認してください
-• AnkiConnectアドオンが正しく動作しているか確認してください`;
+【Checklist】
+• Please ensure the Anki app is running
+• Please ensure AnkiConnect addon is working correctly`;
           }
         }
-        // AnkiConnect API固有のエラー
+        // AnkiConnect API specific errors
         else if (errorMessage.includes("cannot create note because it is a duplicate")) {
-          errorTitle = "重複エラー";
-          errorDescription = `「${word}」は既にAnkiに存在します。
+          errorTitle = "Duplicate error";
+          errorDescription = `"${word}" already exists in Anki.
 
-【対処法】
-• 既存のカードを確認してください
-• 異なる単語を入力してください
-• Ankiで重複カードを削除してから再度お試しください`;
+【Solutions】
+• Please check existing cards
+• Please enter a different word
+• Please delete duplicate cards in Anki and try again`;
         }
         else if (errorMessage.includes("deck was not found")) {
-          errorTitle = "デッキエラー";
-          errorDescription = `デッキ「${settings.deckName}」が見つかりません。
+          errorTitle = "Deck error";
+          errorDescription = `Deck "${settings.deckName}" not found.
 
-【対処法】
-• Ankiでデッキを作成してください
-• 設定ページで正しいデッキ名を入力してください
-• デッキ名の大文字小文字が正確か確認してください
+【Solutions】
+• Please create the deck in Anki
+• Please enter the correct deck name in settings
+• Please check if the deck name capitalization is correct
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
         }
         else if (errorMessage.includes("model was not found")) {
-          errorTitle = "ノートタイプエラー";
-          errorDescription = `ノートタイプが見つかりません。
+          errorTitle = "Note type error";
+          errorDescription = `Note type not found.
 
-【対処法】
-• Ankiに適切なノートタイプが存在することを確認してください
-• 「Basic」や「Basic (and reversed card)」ノートタイプを使用してみてください
+【Solutions】
+• Please ensure appropriate note types exist in Anki
+• Try using "Basic" or "Basic (and reversed card)" note types
 
-【エラー詳細】${error.message}`;
+【Error Details】${error.message}`;
         }
         else {
-          errorDescription = `予期しないエラーが発生しました。
+          errorDescription = `An unexpected error occurred.
 
-【エラー詳細】${error.message}
+【Error Details】${error.message}
 
-【基本的な確認事項】
-• Ankiアプリが起動していますか？
-• AnkiConnectアドオンがインストールされていますか？
-• CORS設定は正しく行われていますか？`;
+【Basic Checklist】
+• Is the Anki app running?
+• Is the AnkiConnect addon installed?
+• Is the CORS configuration correct?`;
         }
       } else {
-        errorDescription = `不明なエラーが発生しました。
+        errorDescription = `An unknown error occurred.
 
-【エラー詳細】${String(error)}
+【Error Details】${String(error)}
 
-【確認事項】
-• Ankiアプリが起動していることを確認してください
-• AnkiConnectアドオンが正しくインストールされているか確認してください`;
+【Checklist】
+• Please ensure the Anki app is running
+• Please ensure AnkiConnect addon is correctly installed`;
       }
 
       toast({
@@ -684,7 +724,7 @@ export default function AnkiVocabularyApp() {
 
   return (
     <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
-      {/* ヘッダー */}
+      {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
@@ -703,12 +743,12 @@ export default function AnkiVocabularyApp() {
             </div>
             <div className="flex items-center space-x-2">
               <Link href="/setup">
-                <Button variant="outline" size="icon" title="AnkiConnect設定ガイド">
+                <Button variant="outline" size="icon" title="AnkiConnect Setup Guide">
                   <HelpCircle className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/settings">
-                <Button variant="outline" size="icon" title="設定">
+                <Button variant="outline" size="icon" title="Settings">
                   <Settings className="h-4 w-4" />
                 </Button>
               </Link>
@@ -717,48 +757,48 @@ export default function AnkiVocabularyApp() {
         </div>
       </div>
 
-      {/* メインコンテンツ */}
+      {/* Main Content */}
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center py-6">
           <h2 className="text-lg text-gray-700 dark:text-gray-300">
-            英単語や文章を入力して、意味の取得・翻訳・画像生成をしてAnkiに送信
+            Enter English words or sentences to retrieve meanings, translations, generate images and send to Anki
           </h2>
           <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-            ✨ 新機能：「一括処理してAnkiに送信」ボタンで、すべての処理を自動化！
+            ✨ New feature: "Auto process and send to Anki" button automates all processing!
           </p>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
               <div className="flex items-center justify-center space-x-2">
-                <span className="font-medium">AnkiConnect 設定確認</span>
+                <span className="font-medium">AnkiConnect Configuration Check</span>
                 <Link href="/setup">
                   <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                    設定ガイド
+                    Setup Guide
                   </Button>
                 </Link>
               </div>
               <p className="mt-2">
-                <strong>現在のドメイン:</strong> {currentDomain}<br />
-                <strong>CORS設定:</strong> webCorsOriginList に "{currentDomain}" を追加してください
+                <strong>Current Domain:</strong> {currentDomain}<br />
+                <strong>CORS Setting:</strong> Add "{currentDomain}" to webCorsOriginList
               </p>
             </div>
           )}
         </div>
 
-        {/* 単語入力カード */}
+        {/* Word Input Card */}
         <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader className="text-center">
             <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
-              単語・文章を入力
+              Enter Word or Sentence
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              学習したい英単語や文章を入力してください
+              Please enter English words or sentences you want to learn
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
               <div className="flex gap-3">
                 <Input
-                  placeholder="例: beautiful または it is a piece of cake"
+                  placeholder="e.g., beautiful or it is a piece of cake"
                   value={word}
                   onChange={(e) => setWord(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && fetchDefinition()}
@@ -772,19 +812,7 @@ export default function AnkiVocabularyApp() {
                   {loading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    "検索・翻訳"
-                  )}
-                </Button>
-                <Button
-                  onClick={translateText}
-                  disabled={translateLoading || !word.trim()}
-                  variant="outline"
-                  className="h-11 px-6 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
-                >
-                  {translateLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    "翻訳"
+                    "Search & Translate"
                   )}
                 </Button>
               </div>
@@ -799,12 +827,12 @@ export default function AnkiVocabularyApp() {
                   {autoProcessing ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      自動処理中...
+                      Auto processing...
                     </>
                   ) : (
                     <>
                       <Zap className="h-5 w-5 mr-2" />
-                      一括処理してAnkiに送信
+                      Auto process and send to Anki
                     </>
                   )}
                 </Button>
@@ -817,15 +845,15 @@ export default function AnkiVocabularyApp() {
           <Card className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-700">
             <CardHeader>
               <CardTitle className="text-xl text-green-600 dark:text-green-400">
-                翻訳結果
+                Translation Result
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="p-4 rounded bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">原文:</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Original:</p>
                   <p className="text-gray-800 dark:text-gray-200 mb-3">{word}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">翻訳:</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Translation:</p>
                   <p className="text-gray-800 dark:text-gray-200 font-medium">{translatedText}</p>
                 </div>
               </div>
@@ -851,13 +879,13 @@ export default function AnkiVocabularyApp() {
             <CardContent className="space-y-4">
               {definition.meanings
                 .filter((meaning) => {
-                  // 主要な品詞のみ表示（稀な動詞用法を除外）
+                  // Display only main parts of speech (exclude rare verb usages)
                   const commonParts = ['noun', 'adjective', 'adverb', 'pronoun', 'preposition', 'conjunction', 'interjection'];
                   const isCommonVerb = meaning.partOfSpeech === 'verb' &&
                     meaning.definitions.some(def =>
-                      def.definition.length > 30 && // 短すぎる定義は稀な用法の可能性
-                      !def.definition.toLowerCase().includes('to become') && // "To become X-like" のような稀な用法を除外
-                      !def.definition.toLowerCase().includes('to form') // "To form X" のような稀な用法を除外
+                      def.definition.length > 30 && // Definitions that are too short might be rare usages
+                      !def.definition.toLowerCase().includes('to become') && // Exclude rare usages like "To become X-like"
+                      !def.definition.toLowerCase().includes('to form') // Exclude rare usages like "To form X"
                     );
                   return commonParts.includes(meaning.partOfSpeech) || isCommonVerb;
                 })
@@ -872,7 +900,7 @@ export default function AnkiVocabularyApp() {
                   {meaning.definitions[0].example && (
                     <div className="bg-blue-100 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-400">
                       <p className="text-blue-800 dark:text-blue-200 italic text-sm">
-                        例文: "{meaning.definitions[0].example}"
+                        Example: "{meaning.definitions[0].example}"
                       </p>
                     </div>
                   )}
@@ -889,12 +917,12 @@ export default function AnkiVocabularyApp() {
                   {imageLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      画像生成中...
+                      Generating image...
                     </>
                   ) : (
                     <>
                       <ImageIcon className="h-4 w-4 mr-2" />
-                      画像を生成
+                      Generate Image
                     </>
                   )}
                 </Button>
@@ -904,7 +932,7 @@ export default function AnkiVocabularyApp() {
                   className="flex-1 h-11 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  Ankiに送信
+                  Send to Anki
                 </Button>
               </div>
             </CardContent>
@@ -915,7 +943,7 @@ export default function AnkiVocabularyApp() {
           <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
             <CardHeader className="text-center">
               <CardTitle className="text-lg text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
-                生成された画像
+                Generated Image
                 <Button
                   variant="outline"
                   size="sm"
@@ -924,7 +952,7 @@ export default function AnkiVocabularyApp() {
                   className="h-8 px-3 border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700"
                 >
                   <RefreshCw className="h-3 w-3" />
-                  <span className="ml-1 text-xs">再生成</span>
+                  <span className="ml-1 text-xs">Regenerate</span>
                 </Button>
               </CardTitle>
             </CardHeader>
@@ -934,17 +962,17 @@ export default function AnkiVocabularyApp() {
                   <div className="space-y-3">
                     <div>
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        画像検索キーワード
+                        Image Search Keywords
                       </label>
                       <Input
-                        placeholder="例: red apple, sunset landscape..."
+                        placeholder="e.g., red apple, sunset landscape..."
                         value={imageQuery}
                         onChange={(e) => setImageQuery(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleImageRegenerateSubmit()}
                         className="mt-1 border-blue-200 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-400"
                       />
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        現在: 「{imageQuery || word}」で検索
+                        Current: Searching for "{imageQuery || word}"
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -956,12 +984,12 @@ export default function AnkiVocabularyApp() {
                         {imageLoading ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            生成中...
+                            Generating...
                           </>
                         ) : (
                           <>
                             <ImageIcon className="h-4 w-4 mr-2" />
-                            画像を生成
+                            Generate Image
                           </>
                         )}
                       </Button>
@@ -971,7 +999,7 @@ export default function AnkiVocabularyApp() {
                         disabled={imageLoading}
                         className="h-9 px-4 border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
                       >
-                        キャンセル
+                        Cancel
                       </Button>
                     </div>
                   </div>
@@ -987,7 +1015,7 @@ export default function AnkiVocabularyApp() {
                 {imageLoading && (
                   <div className="text-center">
                     <p className="text-sm text-blue-600 dark:text-blue-400">
-                      「{imageQuery || word}」の画像を生成しています...
+                      Generating image for "{imageQuery || word}"...
                     </p>
                   </div>
                 )}
@@ -996,7 +1024,7 @@ export default function AnkiVocabularyApp() {
           </Card>
         )}
 
-        {/* 手動入力フォーム */}
+        {/* Manual Input Form */}
         <ManualAnkiForm settings={settings} />
       </div>
     </div>

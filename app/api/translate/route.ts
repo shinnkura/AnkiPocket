@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // サポートされている言語ペアを確認
+  // Check supported language pairs
   const supportedLanguages = ["en", "ja"];
   if (!supportedLanguages.includes(from) || !supportedLanguages.includes(to)) {
     return NextResponse.json(
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // MyMemory API を使用して翻訳
+    // Translate using MyMemory API
     const response = await fetch(
       `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`
     );
