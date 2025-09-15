@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw, Zap } from "lucide-react";
+import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw, Zap, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import ManualAnkiForm from "@/components/ManualAnkiForm";
@@ -701,11 +701,18 @@ export default function AnkiVocabularyApp() {
                 </p>
               </div>
             </div>
-            <Link href="/settings">
-              <Button variant="outline" size="icon">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </Link>
+            <div className="flex items-center space-x-2">
+              <Link href="/setup">
+                <Button variant="outline" size="icon" title="AnkiConnect設定ガイド">
+                  <HelpCircle className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/settings">
+                <Button variant="outline" size="icon" title="設定">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -721,8 +728,13 @@ export default function AnkiVocabularyApp() {
           </p>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
-              <div className="text-center">
+              <div className="flex items-center justify-center space-x-2">
                 <span className="font-medium">AnkiConnect 設定確認</span>
+                <Link href="/setup">
+                  <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                    設定ガイド
+                  </Button>
+                </Link>
               </div>
               <p className="mt-2">
                 <strong>現在のドメイン:</strong> {currentDomain}<br />
