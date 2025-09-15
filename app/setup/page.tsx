@@ -149,11 +149,11 @@ export default function AnkiConnectSetupPage() {
                 <div>&#123;</div>
                 <div className="pl-4">"apiKey": null,</div>
                 <div className="pl-4">"apiLogPath": null,</div>
+                <div className="pl-4">"ignoreOriginList": [],</div>
+                <div className="pl-4">"webBindAddress": "127.0.0.1",</div>
+                <div className="pl-4">"webBindPort": 8765,</div>
                 <div className="pl-4 text-yellow-400">
                   "webCorsOriginList": [
-                </div>
-                <div className="pl-8 text-yellow-400">
-                  "http://localhost:3000",
                 </div>
                 <div className="pl-8 text-yellow-400">
                   "https://your-domain.com"
@@ -168,7 +168,7 @@ export default function AnkiConnectSetupPage() {
                 size="sm"
                 onClick={() =>
                   copyToClipboard(
-                    '{\n    "apiKey": null,\n    "apiLogPath": null,\n    "webCorsOriginList": [\n        "http://localhost:3000",\n        "https://your-domain.com"\n    ]\n}',
+                    '{\n    "apiKey": null,\n    "apiLogPath": null,\n    "ignoreOriginList": [],\n    "webBindAddress": "127.0.0.1",\n    "webBindPort": 8765,\n    "webCorsOriginList": [\n        "https://your-domain.com"\n    ]\n}',
                     "CORS設定"
                   )
                 }
