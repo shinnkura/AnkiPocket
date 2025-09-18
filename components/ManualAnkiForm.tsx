@@ -183,13 +183,23 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
               </TabsList>
 
               <TabsContent value="file" className="space-y-3">
-                <Input
-                  id="manual-image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
-                />
+                <div className="relative">
+                  <input
+                    id="manual-image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-10 border-purple-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {imageFile ? imageFile.name : "Choose file"}
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="url" className="space-y-3">
