@@ -10,7 +10,8 @@
       "Bash(npm test:*)",
       "Bash(curl:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm run lint)"
     ],
     "deny": [],
     "ask": []

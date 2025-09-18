@@ -1,12 +1,12 @@
 /**
- * 翻訳APIのテスト
- * 文章やテキストを翻訳する機能をテストする
+ * Translation API Tests
+ * Tests the functionality for translating sentences and text
  */
 
 import { createMocks } from 'node-mocks-http';
 import { GET } from '../../app/api/translate/route';
 
-// fetch をモック
+// Mock fetch
 global.fetch = jest.fn();
 
 describe('/api/translate', () => {
@@ -16,7 +16,7 @@ describe('/api/translate', () => {
     });
 
     it('英語の文章を日本語に翻訳できる', async () => {
-      // fetch をモックして成功レスポンスを返す
+      // Mock fetchして成功レスポンスを返す
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -44,7 +44,7 @@ describe('/api/translate', () => {
     });
 
     it('日本語の文章を英語に翻訳できる', async () => {
-      // fetch をモックして成功レスポンスを返す
+      // Mock fetchして成功レスポンスを返す
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -73,7 +73,7 @@ describe('/api/translate', () => {
     });
 
     it('複数文の翻訳ができる', async () => {
-      // fetch をモックして成功レスポンスを返す
+      // Mock fetchして成功レスポンスを返す
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -116,7 +116,7 @@ describe('/api/translate', () => {
     });
 
     it('fromパラメータが未指定の場合はenをデフォルトとする', async () => {
-      // fetch をモックして成功レスポンスを返す
+      // Mock fetchして成功レスポンスを返す
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -144,7 +144,7 @@ describe('/api/translate', () => {
     });
 
     it('toパラメータが未指定の場合はjaをデフォルトとする', async () => {
-      // fetch をモックして成功レスポンスを返す
+      // Mock fetchして成功レスポンスを返す
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({

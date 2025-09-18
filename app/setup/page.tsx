@@ -287,7 +287,7 @@ export default function AnkiConnectSetupPage() {
 
   return (
     <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
-      {/* ヘッダー */}
+      {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center space-x-4">
@@ -308,9 +308,9 @@ export default function AnkiConnectSetupPage() {
         </div>
       </div>
 
-      {/* メインコンテンツ */}
+      {/* Main Content */}
       <div className="max-w-4xl mx-auto p-6">
-        {/* ステップナビゲーション */}
+        {/* Step Navigation */}
         <div className="mb-6">
           <div className="flex flex-wrap justify-center space-x-2 mb-4">
             {setupSteps.map((_, index) => (
@@ -335,7 +335,7 @@ export default function AnkiConnectSetupPage() {
           </div>
         </div>
 
-        {/* 現在のステップ */}
+        {/* Current Step */}
         <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader>
             <div className="flex items-center space-x-3">
@@ -353,7 +353,7 @@ export default function AnkiConnectSetupPage() {
           <CardContent>{setupSteps[currentStep].content}</CardContent>
         </Card>
 
-        {/* ナビゲーションボタン */}
+        {/* Navigation Buttons */}
         <div className="flex justify-between mt-6">
           <Button
             variant="outline"
@@ -380,7 +380,7 @@ export default function AnkiConnectSetupPage() {
           )}
         </div>
 
-        {/* 概要カード */}
+        {/* Overview Card */}
         <Card className="mt-8 mb-6 bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-blue-600 dark:text-blue-400">
@@ -418,7 +418,7 @@ export default function AnkiConnectSetupPage() {
           </CardContent>
         </Card>
 
-        {/* トラブルシューティング */}
+        {/* Troubleshooting */}
         <Card className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2 text-yellow-700 dark:text-yellow-300">
@@ -455,7 +455,7 @@ export default function AnkiConnectSetupPage() {
           </CardContent>
         </Card>
 
-        {/* 参考リンク */}
+        {/* Reference Links */}
         <Card className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <CardHeader>
             <CardTitle className="text-gray-700 dark:text-gray-300">

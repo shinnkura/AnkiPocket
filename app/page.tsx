@@ -643,51 +643,51 @@ export default function AnkiVocabularyApp() {
               errorTitle = "Connection error";
               errorDescription = `Cannot connect to AnkiConnect.
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon (2055492159) is installed
 • Please ensure AnkiConnect is enabled in Anki's "Tools" → "Add-ons"
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 404:
               errorTitle = "AnkiConnect not detected";
               errorDescription = `AnkiConnect not found.
 
-【Checklist】
+[Checklist]
 • Please install AnkiConnect addon (2055492159)
 • Please restart Anki
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 403:
               errorTitle = "CORS configuration error";
               errorDescription = `CORS configuration is incorrect.
 
-【Setup Steps】
+[Setup Steps]
 1. Open Anki's "Tools" → "Add-ons"
 2. Select AnkiConnect and click "Config"
 3. Add "${currentDomain}" to "webCorsOriginList"
 4. Restart Anki
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 500:
               errorTitle = "Anki internal error";
               errorDescription = `An error occurred on Anki's side.
 
-【Checklist】
+[Checklist]
 • Please check if the deck name "${settings.deckName}" is valid
 • Please check if Anki's note type is correctly configured
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             default:
               errorDescription = `HTTP ${status} error occurred.
 
-【Error Details】${error.message}
+[Error Details]${error.message}
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon is working correctly`;
           }
@@ -697,7 +697,7 @@ export default function AnkiVocabularyApp() {
           errorTitle = "Duplicate error";
           errorDescription = `"${word}" already exists in Anki.
 
-【Solutions】
+[Solutions]
 • Please check existing cards
 • Please enter a different word
 • Please delete duplicate cards in Anki and try again`;
@@ -706,29 +706,29 @@ export default function AnkiVocabularyApp() {
           errorTitle = "Deck error";
           errorDescription = `Deck "${settings.deckName}" not found.
 
-【Solutions】
+[Solutions]
 • Please create the deck in Anki
 • Please enter the correct deck name in settings
 • Please check if the deck name capitalization is correct
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
         }
         else if (errorMessage.includes("model was not found")) {
           errorTitle = "Note type error";
           errorDescription = `Note type not found.
 
-【Solutions】
+[Solutions]
 • Please ensure appropriate note types exist in Anki
 • Try using "Basic" or "Basic (and reversed card)" note types
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
         }
         else {
           errorDescription = `An unexpected error occurred.
 
-【Error Details】${error.message}
+[Error Details]${error.message}
 
-【Basic Checklist】
+[Basic Checklist]
 • Is the Anki app running?
 • Is the AnkiConnect addon installed?
 • Is the CORS configuration correct?`;
@@ -736,9 +736,9 @@ export default function AnkiVocabularyApp() {
       } else {
         errorDescription = `An unknown error occurred.
 
-【Error Details】${String(error)}
+[Error Details]${String(error)}
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon is correctly installed`;
       }
@@ -1008,51 +1008,51 @@ export default function AnkiVocabularyApp() {
               errorTitle = "Connection error";
               errorDescription = `Cannot connect to AnkiConnect.
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon (2055492159) is installed
 • Please ensure AnkiConnect is enabled in Anki's "Tools" → "Add-ons"
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 404:
               errorTitle = "AnkiConnect not detected";
               errorDescription = `AnkiConnect not found.
 
-【Checklist】
+[Checklist]
 • Please install AnkiConnect addon (2055492159)
 • Please restart Anki
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 403:
               errorTitle = "CORS configuration error";
               errorDescription = `CORS configuration is incorrect.
 
-【Setup Steps】
+[Setup Steps]
 1. Open Anki's "Tools" → "Add-ons"
 2. Select AnkiConnect and click "Config"
 3. Add "${currentDomain}" to "webCorsOriginList"
 4. Restart Anki
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             case 500:
               errorTitle = "Anki internal error";
               errorDescription = `An error occurred on Anki's side.
 
-【Checklist】
+[Checklist]
 • Please check if the deck name "${settings.deckName}" is valid
 • Please check if Anki's note type is correctly configured
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
               break;
             default:
               errorDescription = `HTTP ${status} error occurred.
 
-【Error Details】${error.message}
+[Error Details]${error.message}
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon is working correctly`;
           }
@@ -1062,7 +1062,7 @@ export default function AnkiVocabularyApp() {
           errorTitle = "Duplicate error";
           errorDescription = `"${word}" already exists in Anki.
 
-【Solutions】
+[Solutions]
 • Please check existing cards
 • Please enter a different word
 • Please delete duplicate cards in Anki and try again`;
@@ -1071,29 +1071,29 @@ export default function AnkiVocabularyApp() {
           errorTitle = "Deck error";
           errorDescription = `Deck "${settings.deckName}" not found.
 
-【Solutions】
+[Solutions]
 • Please create the deck in Anki
 • Please enter the correct deck name in settings
 • Please check if the deck name capitalization is correct
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
         }
         else if (errorMessage.includes("model was not found")) {
           errorTitle = "Note type error";
           errorDescription = `Note type not found.
 
-【Solutions】
+[Solutions]
 • Please ensure appropriate note types exist in Anki
 • Try using "Basic" or "Basic (and reversed card)" note types
 
-【Error Details】${error.message}`;
+[Error Details]${error.message}`;
         }
         else {
           errorDescription = `An unexpected error occurred.
 
-【Error Details】${error.message}
+[Error Details]${error.message}
 
-【Basic Checklist】
+[Basic Checklist]
 • Is the Anki app running?
 • Is the AnkiConnect addon installed?
 • Is the CORS configuration correct?`;
@@ -1101,9 +1101,9 @@ export default function AnkiVocabularyApp() {
       } else {
         errorDescription = `An unknown error occurred.
 
-【Error Details】${String(error)}
+[Error Details]${String(error)}
 
-【Checklist】
+[Checklist]
 • Please ensure the Anki app is running
 • Please ensure AnkiConnect addon is correctly installed`;
       }
@@ -1141,7 +1141,7 @@ export default function AnkiVocabularyApp() {
                 size="icon"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-all duration-200"
-                title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               >
                 {theme === 'dark' ? (
                   <Sun className="h-4 w-4 text-amber-500" />
@@ -1168,10 +1168,10 @@ export default function AnkiVocabularyApp() {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center py-6">
           <h2 className="text-lg text-gray-800 dark:text-gray-100 leading-relaxed">
-            🎯 英単語や英文を入力して、意味・翻訳・画像を取得し、Ankiに送信
+            🎯 Enter English words or sentences to get meanings, translations, and images, then send to Anki
           </h2>
           <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
-            ✨ 新機能：「Auto process」ボタンで辞書検索からAnki送信まで一括実行！
+            ✨ New feature: One-click execution from dictionary search to Anki sending with the "Auto process" button!
           </p>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
@@ -1265,7 +1265,7 @@ export default function AnkiVocabularyApp() {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 font-medium">
-                    または
+                    or
                   </span>
                 </div>
               </div>
@@ -1292,7 +1292,7 @@ export default function AnkiVocabularyApp() {
                   )}
                 </Button>
                 <p className="text-xs text-gray-500 dark:text-gray-400 text-center sm:text-left">
-                  ✨ 辞書検索・画像生成・Anki送信をワンクリックで実行
+                  ✨ Execute dictionary search, image generation, and Anki sending with one click
                 </p>
               </div>
             </div>
@@ -1306,7 +1306,7 @@ export default function AnkiVocabularyApp() {
                 <div className="p-2 bg-emerald-100 dark:bg-emerald-800/20 rounded-lg">
                   <Volume2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <span className="text-emerald-700 dark:text-emerald-300 font-bold">翻訳結果</span>
+                <span className="text-emerald-700 dark:text-emerald-300 font-bold">Translation Result</span>
                 <Badge variant="outline" className="text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600 bg-white/50 dark:bg-emerald-800/20">
                   <span className="font-semibold">Phrase Mode</span>
                 </Badge>
@@ -1319,7 +1319,7 @@ export default function AnkiVocabularyApp() {
                     <div className="flex items-start gap-3">
                       <div className="w-1 h-12 bg-gray-500 rounded-full flex-shrink-0 mt-1"></div>
                       <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">原文 (English)</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Original (English)</p>
                         <p className="text-gray-800 dark:text-gray-200 text-lg leading-relaxed">{word}</p>
                       </div>
                     </div>
@@ -1328,7 +1328,7 @@ export default function AnkiVocabularyApp() {
                     <div className="flex items-start gap-3">
                       <div className="w-1 h-12 bg-emerald-500 rounded-full flex-shrink-0 mt-1"></div>
                       <div>
-                        <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-2">翻訳 (Japanese)</p>
+                        <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-2">Translation (Japanese)</p>
                         <p className="text-gray-800 dark:text-gray-200 font-medium text-lg leading-relaxed">{translatedText}</p>
                       </div>
                     </div>
@@ -1391,7 +1391,7 @@ export default function AnkiVocabularyApp() {
                       {meaning.definitions[0].example && (
                         <div className="bg-blue-100/70 dark:bg-blue-900/30 p-4 rounded-lg border-l-4 border-blue-400">
                           <p className="text-blue-800 dark:text-blue-200 italic">
-                            <span className="font-medium">例:</span> "{meaning.definitions[0].example}"
+                            <span className="font-medium">Example:</span> "{meaning.definitions[0].example}"
                           </p>
                         </div>
                       )}
@@ -1457,7 +1457,7 @@ export default function AnkiVocabularyApp() {
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-16 bg-green-500 rounded-full flex-shrink-0 mt-1"></div>
                   <div>
-                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">定義</p>
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mb-2">Definition</p>
                     <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-lg">
                       {cambridgeDefinition.definition}
                     </p>
@@ -1508,7 +1508,7 @@ export default function AnkiVocabularyApp() {
                   <div className="p-2 bg-purple-100 dark:bg-purple-800/20 rounded-lg">
                     <ImageIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <span className="text-purple-700 dark:text-purple-300 font-bold">生成された画像</span>
+                  <span className="text-purple-700 dark:text-purple-300 font-bold">Generated Image</span>
                 </div>
                 <Button
                   variant="outline"
@@ -1518,7 +1518,7 @@ export default function AnkiVocabularyApp() {
                   className="h-8 px-3 border-purple-200 hover:border-purple-300 hover:bg-purple-50 dark:border-purple-600 dark:hover:bg-purple-700/20 transition-all duration-200"
                 >
                   <RefreshCw className="h-3 w-3" />
-                  <span className="ml-1 text-xs">再生成</span>
+                  <span className="ml-1 text-xs">Regenerate</span>
                 </Button>
               </CardTitle>
             </CardHeader>
@@ -1528,7 +1528,7 @@ export default function AnkiVocabularyApp() {
                   <div className="p-4 rounded-xl bg-white/70 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 shadow-sm space-y-3">
                     <div>
                       <label className="text-sm font-medium text-purple-600 dark:text-purple-400 mb-2 block">
-                        🔍 画像検索キーワード
+                        🔍 Image Search Keywords
                       </label>
                       <Input
                         placeholder="例: red apple, sunset landscape, cute cat..."
@@ -1538,7 +1538,7 @@ export default function AnkiVocabularyApp() {
                         className="border-purple-200 dark:border-purple-600 focus:border-purple-400 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-100 dark:focus:ring-purple-900/20"
                       />
                       <p className="text-xs text-purple-500 dark:text-purple-400 mt-2">
-                        💡 現在の検索: "<span className="font-medium">{imageQuery || word}</span>"
+                        💡 Current search: "<span className="font-medium">{imageQuery || word}</span>"
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -1550,14 +1550,14 @@ export default function AnkiVocabularyApp() {
                         {imageLoading ? (
                           <>
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            <span className="hidden sm:inline">画像生成中...</span>
-                            <span className="sm:hidden">生成中...</span>
+                            <span className="hidden sm:inline">Generating image...</span>
+                            <span className="sm:hidden">Generating...</span>
                           </>
                         ) : (
                           <>
                             <ImageIcon className="h-4 w-4 mr-2" />
-                            <span className="hidden sm:inline">画像を生成</span>
-                            <span className="sm:hidden">生成</span>
+                            <span className="hidden sm:inline">Generate Image</span>
+                            <span className="sm:hidden">Generate</span>
                           </>
                         )}
                       </Button>
@@ -1567,7 +1567,7 @@ export default function AnkiVocabularyApp() {
                         disabled={imageLoading}
                         className="h-10 px-4 border-purple-300 hover:bg-purple-50 dark:border-purple-600 dark:hover:bg-purple-700/20 transition-all duration-200"
                       >
-                        キャンセル
+                        Cancel
                       </Button>
                     </div>
                   </div>
@@ -1590,7 +1590,7 @@ export default function AnkiVocabularyApp() {
                     <div className="flex items-center justify-center gap-3">
                       <Loader2 className="h-5 w-5 animate-spin text-purple-600 dark:text-purple-400" />
                       <p className="text-purple-600 dark:text-purple-400 font-medium">
-                        "<span className="font-bold">{imageQuery || word}</span>" の画像を生成中...
+                        Generating image for "<span className="font-bold">{imageQuery || word}</span>"...
                       </p>
                     </div>
                   </div>

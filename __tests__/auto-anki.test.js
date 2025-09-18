@@ -1,27 +1,27 @@
 /**
- * 自動Anki送信機能のテスト
+ * Auto Anki Submission Feature Tests
  *
- * このテストは以下の機能をカバーします：
- * 1. 単語の自動処理（辞書検索 + 画像生成 + Anki送信）
- * 2. 文章の自動処理（翻訳 + 画像生成 + Anki送信）
- * 3. エラーハンドリング
+ * This test covers the following functionality:
+ * 1. Automatic word processing (dictionary search + image generation + Anki submission)
+ * 2. Automatic sentence processing (translation + image generation + Anki submission)
+ * 3. Error handling
  */
 
 import { jest } from '@jest/globals';
 
-// モック設定
+// Mock setup
 global.fetch = jest.fn();
 
-describe('自動Anki送信API', () => {
+describe('Auto Anki Submission API', () => {
   beforeEach(() => {
     fetch.mockClear();
   });
 
-  describe('単語の自動処理', () => {
-    test('単語の意味・画像を自動取得してAnkiに送信できること', async () => {
-      // モックレスポンスを設定
+  describe('Automatic word processing', () => {
+    test('should automatically retrieve word meanings and images and send to Anki', async () => {
+      // Set up mock responses
       fetch
-        // 1. 辞書API呼び出し
+        // 1. Dictionary API call
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -40,7 +40,7 @@ describe('自動Anki送信API', () => {
             success: true
           })
         })
-        // 2. Unsplash API呼び出し
+        // 2. Unsplash API call
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -101,9 +101,9 @@ describe('自動Anki送信API', () => {
       expect(result.ankiNoteId).toBe(1234567890);
     });
 
-    test('画像取得に失敗してもAnki送信は成功すること', async () => {
+    test('should succeed in Anki submission even if image retrieval fails', async () => {
       fetch
-        // 1. 辞書API成功
+        // 1. Dictionary API success
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -121,12 +121,12 @@ describe('自動Anki送信API', () => {
             success: true
           })
         })
-        // 2. Unsplash API失敗
+        // 2. Unsplash API failure
         .mockResolvedValueOnce({
           ok: false,
           status: 404
         })
-        // 3-5. AnkiConnect成功
+        // 3-5. AnkiConnect success
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ result: ['Basic'], error: null })
@@ -158,10 +158,10 @@ describe('自動Anki送信API', () => {
     });
   });
 
-  describe('文章の自動処理', () => {
-    test('文章の翻訳・画像を自動取得してAnkiに送信できること', async () => {
+  describe('Automatic sentence processing', () => {
+    test('should automatically retrieve sentence translations and images and send to Anki', async () => {
       fetch
-        // 1. 翻訳API呼び出し
+        // 1. Translation API call
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -169,7 +169,7 @@ describe('自動Anki送信API', () => {
             translatedText: 'それは簡単なことです'
           })
         })
-        // 2. Unsplash API呼び出し（フレーズの最初の単語で検索）
+        // 2. Unsplash API call (search with first word of phrase)
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -216,8 +216,8 @@ describe('自動Anki送信API', () => {
     });
   });
 
-  describe('エラーハンドリング', () => {
-    test('無効な入力でエラーを返すこと', async () => {
+  describe('Error handling', () => {
+    test('should return error for invalid input', async () => {
       const response = await fetch('/api/auto-anki', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -231,9 +231,9 @@ describe('自動Anki送信API', () => {
       expect(response.status).toBe(400);
     });
 
-    test('AnkiConnect接続エラーを適切に処理すること', async () => {
+    test('should properly handle AnkiConnect connection errors', async () => {
       fetch
-        // 1. 辞書API成功
+        // 1. Dictionary API success
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({
@@ -242,12 +242,12 @@ describe('自動Anki送信API', () => {
             success: true
           })
         })
-        // 2. Unsplash API成功
+        // 2. Unsplash API success
         .mockResolvedValueOnce({
           ok: true,
           json: async () => ({ imageUrl: 'test.jpg', source: 'unsplash' })
         })
-        // 3. AnkiConnect失敗
+        // 3. AnkiConnect failure
         .mockRejectedValueOnce(new Error('Failed to fetch'));
 
       const response = await fetch('/api/auto-anki', {
