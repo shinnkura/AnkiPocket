@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw, Zap, HelpCircle, BookOpen } from "lucide-react";
+import { Loader2, Volume2, ImageIcon, Send, Settings, RefreshCw, Zap, HelpCircle, BookOpen, Moon, Sun } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import ManualAnkiForm from "@/components/ManualAnkiForm";
 
@@ -58,6 +59,7 @@ export default function AnkiVocabularyApp() {
   const [translatedText, setTranslatedText] = useState("");
   const [autoProcessing, setAutoProcessing] = useState(false);
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1115,25 +1117,38 @@ export default function AnkiVocabularyApp() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-slate-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-blue-200 dark:border-gray-700">
+      <div className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 dark:backdrop-blur-sm border-b border-blue-200/60 dark:border-gray-700/60 shadow-sm dark:shadow-gray-900/20">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-lg">A</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
                   AnkiPocket
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Smart vocabulary learning
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  ✨ Smart vocabulary learning
                 </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="border-blue-200 hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-gray-700 transition-all duration-200"
+                title={theme === 'dark' ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-4 w-4 text-amber-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-blue-600" />
+                )}
+              </Button>
               <Link href="/setup">
                 <Button variant="outline" size="icon" title="AnkiConnect Setup Guide">
                   <HelpCircle className="h-4 w-4" />
@@ -1152,11 +1167,11 @@ export default function AnkiVocabularyApp() {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="text-center py-6">
-          <h2 className="text-lg text-gray-700 dark:text-gray-300">
-            Enter English words or sentences to retrieve meanings, translations, generate images and send to Anki
+          <h2 className="text-lg text-gray-800 dark:text-gray-100 leading-relaxed">
+            🎯 英単語や英文を入力して、意味・翻訳・画像を取得し、Ankiに送信
           </h2>
-          <p className="text-sm text-green-600 dark:text-green-400 mt-2">
-            ✨ New feature: "Auto process and send to Anki" button automates all processing!
+          <p className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
+            ✨ 新機能：「Auto process」ボタンで辞書検索からAnki送信まで一括実行！
           </p>
           {currentDomain && (
             <div className="inline-block text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-3 rounded border border-blue-200 dark:border-blue-800 mt-4">
@@ -1177,7 +1192,7 @@ export default function AnkiVocabularyApp() {
         </div>
 
         {/* Word Input Card */}
-        <Card className="bg-white dark:bg-gray-800 border border-blue-200 dark:border-gray-700">
+        <Card className="bg-white/70 backdrop-blur-sm dark:bg-gray-800/70 dark:backdrop-blur-sm border border-blue-200/60 dark:border-gray-600/60 shadow-xl dark:shadow-2xl dark:shadow-gray-900/30">
           <CardHeader className="text-center">
             <CardTitle className="text-xl text-blue-600 dark:text-blue-400">
               Enter Word or Sentence
@@ -1285,7 +1300,7 @@ export default function AnkiVocabularyApp() {
         </Card>
 
         {translatedText && (
-          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-200 dark:border-emerald-700 shadow-md">
+          <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:via-teal-900/15 dark:to-cyan-900/20 border border-emerald-200/60 dark:border-emerald-600/60 shadow-xl dark:shadow-2xl dark:shadow-emerald-900/20 backdrop-blur-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-3 text-xl">
                 <div className="p-2 bg-emerald-100 dark:bg-emerald-800/20 rounded-lg">
@@ -1325,7 +1340,7 @@ export default function AnkiVocabularyApp() {
         )}
 
         {definition && (
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 border border-blue-200 dark:border-blue-700 shadow-md">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:via-indigo-900/15 dark:to-purple-900/20 border border-blue-200/60 dark:border-blue-600/60 shadow-xl dark:shadow-2xl dark:shadow-blue-900/20 backdrop-blur-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-3 text-xl">
                 <div className="flex items-center gap-3">
@@ -1421,7 +1436,7 @@ export default function AnkiVocabularyApp() {
         )}
 
         {cambridgeDefinition && (
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 border border-green-200 dark:border-green-700 shadow-md">
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:via-emerald-900/15 dark:to-teal-900/20 border border-green-200/60 dark:border-green-600/60 shadow-xl dark:shadow-2xl dark:shadow-green-900/20 backdrop-blur-sm">
             <CardHeader className="pb-3">
               <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-3 text-xl">
                 <div className="flex items-center gap-3">
@@ -1486,7 +1501,7 @@ export default function AnkiVocabularyApp() {
         )}
 
         {imageUrl && (
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 border border-purple-200 dark:border-purple-700 shadow-md">
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:via-pink-900/15 dark:to-violet-900/20 border border-purple-200/60 dark:border-purple-600/60 shadow-xl dark:shadow-2xl dark:shadow-purple-900/20 backdrop-blur-sm">
             <CardHeader className="text-center pb-3">
               <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 text-lg">
                 <div className="flex items-center gap-2 justify-center sm:justify-start">
@@ -1559,11 +1574,11 @@ export default function AnkiVocabularyApp() {
                 )}
 
                 <div className="text-center">
-                  <div className="inline-block p-3 rounded-xl bg-white/70 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 shadow-sm">
+                  <div className="inline-block p-3 rounded-xl bg-white/90 dark:bg-gray-800/60 border border-purple-100/60 dark:border-purple-700/60 shadow-lg dark:shadow-xl dark:shadow-purple-900/30 backdrop-blur-sm">
                     <img
                       src={imageUrl || "/placeholder.svg"}
                       alt={imageQuery || word}
-                      className="w-full max-w-md rounded-lg shadow-md border border-purple-200 dark:border-purple-600"
+                      className="w-full max-w-md rounded-lg shadow-md border border-purple-200/60 dark:border-purple-500/60"
                       crossOrigin="anonymous"
                       style={{ maxHeight: '400px' }}
                     />
