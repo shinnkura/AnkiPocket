@@ -122,8 +122,8 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
       // Check if it's a duplicate card error
       if (errorMessage.includes("duplicate")) {
         toast({
-          title: "Duplicate Card",
-          description: `カード "${word}" は既にAnkiに存在します。`,
+          title: "重複カード",
+          description: `"${word}" は既にAnkiに存在します。単語を変更するか、Ankiで既存のカードを確認してください。`,
           variant: "destructive",
         });
       } else {
