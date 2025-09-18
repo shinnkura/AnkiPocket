@@ -117,11 +117,22 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
       }
     } catch (error) {
       console.error("Manual Anki send error:", error);
-      toast({
-        title: "Send Error",
-        description: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: "destructive",
-      });
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      // Check if it's a duplicate card error
+      if (errorMessage.includes("duplicate")) {
+        toast({
+          title: "Duplicate Card",
+          description: `カード "${word}" は既にAnkiに存在します。`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Send Error",
+          description: `エラーが発生しました: ${errorMessage}`,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -208,7 +219,7 @@ export default function ManualAnkiForm({ settings }: ManualAnkiFormProps) {
                     placeholder="e.g. https://example.com/image.jpg"
                     value={imageUrlInput}
                     onChange={(e) => setImageUrlInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleImageUrlSubmit()}
+                    onKeyDown={(e) => e.key === "Enter" && handleImageUrlSubmit()}
                     className="flex-1 border-purple-200 dark:border-gray-600 focus:border-purple-400 dark:focus:border-purple-400"
                   />
                   <Button
